@@ -35,22 +35,6 @@ def num(x):
     return float(x)
 
 
-def cores_tab():
-    with open(os.path.join(mg.TABELAS, "cores.csv"), encoding="utf-8") as f:
-        return sorted((mg.norm(l) for l in f.read().split("\n")[1:] if l.strip()), key=len, reverse=True)
-
-
-def separar(desc, cores, tams):
-    """'VESTIDO MIDI LINHO OFF WHITE PP' -> ('VESTIDO MIDI LINHO', 'OFF WHITE', 'PP')"""
-    w = desc.split()
-    tam = w[-1] if w and mg.norm_tam(w[-1]) in tams else None
-    corpo = " ".join(w[:-1] if tam else w)
-    for c in cores:
-        if mg.norm(corpo).endswith(" " + c):
-            return corpo[: len(corpo) - len(c)].strip(), c, mg.norm_tam(tam) if tam else "ÚNICO"
-    return corpo, None, mg.norm_tam(tam) if tam else "ÚNICO"
-
-
 def salvar_cadastrados(ex, path):
     wb = openpyxl.Workbook()
     ws = wb.active
@@ -66,7 +50,7 @@ def revisar_catalogo(v, cores, tams):
     achados = []
     cor_fora = Counter()
     for d in v.desc:
-        _, c, _ = separar(d, cores, tams)
+        _, c, _ = mg.separar(d, cores, tams)
         if c is None:
             cor_fora[" ".join(d.split()[-2:-1])] += 1
     for k, n in cor_fora.most_common(15):
@@ -78,7 +62,7 @@ def revisar_catalogo(v, cores, tams):
         achados.append(["Referência com mais de um Cód. Auxiliar na coleção", f"marca {m} ref {ref}",
                         ", ".join(sorted(v[(v.ref_n == ref) & (v.aux.str[1:3] == m)].aux.unique()))])
     for aux, gr in v.groupby("aux"):
-        nomes = {separar(d, cores, tams)[0] for d in gr.desc}
+        nomes = {mg.separar(d, cores, tams)[0] for d in gr.desc}
         if len(nomes) > 1:
             achados.append(["Cód. Auxiliar com nomes diferentes", aux, " / ".join(sorted(nomes))[:120]])
         if gr.ref_n.nunique() > 1:
@@ -96,7 +80,7 @@ def main(cadastrados, modelo, saida, n, colecao="VERÃO 27"):
     os.makedirs(saida, exist_ok=True)
     ex = mg.ler_cadastrados(cadastrados)
     dig = mg.colecoes()[mg.norm(colecao)]
-    tams, cores = set(mg.tamanhos()), cores_tab()
+    tams, cores = set(mg.tamanhos()), mg.cores_tab()
     v = ex[ex.aux.str.fullmatch(dig + r"\d{5}")]
     id2marca = {m["id"]: nome for nome, m in mg.marcas().items()}
 
@@ -125,7 +109,7 @@ def main(cadastrados, modelo, saida, n, colecao="VERÃO 27"):
             ws.cell(r + 1, i + 1, t)
         r += 2
         for (aux, ref), g in grp.groupby(["aux", "ref"]):  # ordem em que foram cadastradas
-            partes = [separar(d, cores, tams) for d in g.desc]
+            partes = [mg.separar(d, cores, tams) for d in g.desc]
             nome = Counter(p[0] for p in partes).most_common(1)[0][0]
             linhas = defaultdict(dict)
             for (nm, c, t), d in zip(partes, g.desc):
@@ -136,7 +120,7 @@ def main(cadastrados, modelo, saida, n, colecao="VERÃO 27"):
                                      num(g.venda.iloc[0]), None]):
                 ws.cell(r, i + 1, val)
             r += 1
-            real[(mg.norm(marca), mg.norm(ref))] = dict(aux=aux, descs=set(mg.norm(d) for d in g.desc))
+            real[(mg.norm(marca), mg.ref_key(ref))] = dict(aux=aux, descs=set(mg.norm(d) for d in g.desc))
             with open(os.path.join(conf_dir, f"0~{mg.slug(marca)}~{mg.slug(ref)}.json"), "w") as f:
                 json.dump(dict(loja=0, marca=marca, ref=ref, esperado=len(g),
                                linhas=[{"cor": c, "q": q} for c, q in linhas.items()]), f)
@@ -154,8 +138,8 @@ def main(cadastrados, modelo, saida, n, colecao="VERÃO 27"):
         h = [(c.value or "").strip() for c in w2[1]]
         for row in w2.iter_rows(min_row=2, values_only=True):
             d = dict(zip(h, row))
-            gerados[(mg.norm(d["Marca"]), mg.norm(d["Referência"]))].add(mg.norm(d["Descrição"]))
-    aux_ger = {(mg.norm(m), mg.norm(ref)): a for m, ref, _, a, _ in res["codigos"]}
+            gerados[(mg.norm(d["Marca"]), mg.ref_key(d["Referência"]))].add(mg.norm(d["Descrição"]))
+    aux_ger = {(mg.norm(m), mg.ref_key(ref)): a for m, ref, _, a, _ in res["codigos"]}
 
     # 4. compara
     rel = []

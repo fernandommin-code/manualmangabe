@@ -25,6 +25,36 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import mangabe as mg  # noqa: E402
 
 
+def atribuir_codigo(it, ex, ultimos, tab_marcas, tab_col, pend):
+    """Cód. Auxiliar da referência: o já usado (reposição) ou o próximo livre da faixa.
+    Retorna (aux, origem, marca_info) ou None (pendência registrada)."""
+    tm = tab_marcas.get(mg.norm(it["marca"]))
+    if not tm:
+        pend.append(["Marca sem ID em tabelas/marcas.csv", it["marca"], it["ref"], ""])
+        return None
+    dig = tab_col.get(mg.norm(it["col"]))
+    if not dig:
+        pend.append(["Coleção sem dígito em tabelas/colecoes.csv", it["marca"], it["ref"], it["col"]])
+        return None
+    aux = mg.aux_existente(ex, it["ref"], dig, tm["id"])
+    if aux:
+        nomes = ex.desc_n[ex.aux == aux]
+        if not any(d.startswith(mg.norm(it["desc"]) + " ") or d == mg.norm(it["desc"]) for d in nomes):
+            pend.append(["Reposição com nome diferente: o cadastro usa o nome do Microvix",
+                         it["marca"], it["ref"], f"planilha: {it['desc']} | Microvix: {mg.nome_base_microvix(ex, aux)}"])
+        return aux, "reposição (código existente)", tm
+    parte = mg.parte_da_peca(it["desc"])
+    if parte is None:
+        parte = "baixo"
+        pend.append(["Tipo de peça desconhecido: assumido parte de baixo/peça única — conferir",
+                     it["marca"], it["ref"], it["desc"]])
+    u = ultimos.setdefault((dig, tm["id"]), {"baixo": -1, "cima": 499})
+    u[parte] += 1
+    if (parte == "baixo" and u[parte] > 499) or u[parte] > 999:
+        raise SystemExit(f"Faixa esgotada: {it['marca']} {parte}")
+    return f"{dig}{tm['id']}{u[parte]:03d}", "novo", tm
+
+
 def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
     itens = mg.ler_planilha(planilha)
     ex = mg.ler_cadastrados(cadastrados)
@@ -57,40 +87,20 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
         if not it:
             pend.append(["Conferida mas fora da planilha (sem custo/preço)", k[0], k[1], "incluir na planilha e rodar de novo"])
             continue
-        tm = tab_marcas.get(mg.norm(it["marca"]))
-        if not tm:
-            pend.append(["Marca sem ID em tabelas/marcas.csv", it["marca"], it["ref"], ""])
+        r = atribuir_codigo(it, ex, ultimos, tab_marcas, tab_col, pend)
+        if not r:
             continue
-        dig = tab_col.get(mg.norm(it["col"]))
-        if not dig:
-            pend.append(["Coleção sem dígito em tabelas/colecoes.csv", it["marca"], it["ref"], it["col"]])
-            continue
-
-        aux = mg.aux_existente(ex, it["ref"], dig, tm["id"])
-        origem = "reposição (código existente)"
-        if aux:
-            nomes = ex.desc_n[ex.aux == aux]
-            if not any(d.startswith(mg.norm(it["desc"]) + " ") for d in nomes):
-                pend.append(["Reposição com nome diferente do Microvix (a grade fica com dois nomes) — conferir",
-                             it["marca"], it["ref"], f"planilha: {it['desc']} | Microvix: {nomes.iloc[0]}"])
-        if not aux:
-            parte = mg.parte_da_peca(it["desc"])
-            if parte is None:
-                parte = "baixo"
-                pend.append(["Tipo de peça desconhecido: assumido parte de baixo/peça única — conferir",
-                             it["marca"], it["ref"], it["desc"]])
-            u = ultimos.setdefault((dig, tm["id"]), {"baixo": -1, "cima": 499})
-            u[parte] += 1
-            if (parte == "baixo" and u[parte] > 499) or u[parte] > 999:
-                raise SystemExit(f"Faixa esgotada: {it['marca']} {parte}")
-            aux = f"{dig}{tm['id']}{u[parte]:03d}"
-            origem = "novo"
-        codigos.append([it["marca"], it["ref"], it["desc"], aux, origem])
+        aux, origem, tm = r
+        desc_base, ref_out = it["desc"], it["ref"]
+        if origem.startswith("reposição"):  # mantém nome e referência como já estão no Microvix
+            desc_base = mg.nome_base_microvix(ex, aux) or desc_base
+            ref_out = ex.ref[ex.aux == aux].iloc[0]
+        codigos.append([it["marca"], ref_out, desc_base, aux, origem])
 
         for cor, tam in sorted(g, key=lambda x: (x[0], mg.ordem_tam(x[1]))):
-            desc = mg.descricao_produto(it["desc"], cor, tam)
+            desc = mg.descricao_produto(desc_base, cor, tam)
             q = g[(cor, tam)]
-            cod = mg.produto_existente(ex, it["ref"], cor, tam, aux)
+            cod = mg.produto_existente(ex, ref_out, cor, tam, aux)
             if cod:
                 ja_cad.append([cod, desc, it["ref"], aux, q.get(0, 0), q.get(1, 0), q.get(2, 0)])
                 continue
@@ -100,7 +110,7 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
                 row[col[nome]] = v
 
             put("Descrição", desc)
-            put("Referência", it["ref"])
+            put("Referência", ref_out)
             put("Cód. Auxiliar", aux)
             put("Marca", it["marca"])
             put("Coleção", it["col"])

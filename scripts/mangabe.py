@@ -5,6 +5,7 @@ import json
 import os
 import re
 import unicodedata
+from collections import Counter
 
 import openpyxl
 import pandas as pd
@@ -17,6 +18,11 @@ def norm(s):
     """Maiúsculo, sem acento, espaços simples."""
     s = unicodedata.normalize("NFD", str(s or "")).encode("ascii", "ignore").decode()
     return " ".join(s.upper().split())
+
+
+def ref_key(s):
+    """Chave de comparação da referência: sem acento, maiúscula e sem zeros à esquerda (09404 = 9404)."""
+    return norm(s).lstrip("0") or "0"
 
 
 def slug(s):
@@ -52,8 +58,11 @@ def tipos_peca():
 
 def parte_da_peca(desc):
     """'cima' (500–999) ou 'baixo' (000–499, inclui peça única). None se a 1ª palavra não estiver na tabela."""
-    palavras = norm(desc).split()
-    return tipos_peca().get(palavras[0]) if palavras else None
+    tipos = tipos_peca()
+    for w in norm(desc).split():  # 1ª palavra conhecida: "MAXI COLAR" -> COLAR, "MAXI CROPPED" -> CROPPED
+        if w in tipos:
+            return tipos[w]
+    return None
 
 
 TAM_ALIAS = {"U": "ÚNICO", "UNICO": "ÚNICO", "UN": "ÚNICO", "UNICA": "ÚNICO", "ÚNICA": "ÚNICO"}
@@ -67,6 +76,22 @@ def norm_tam(t):
 def norm_cor(c):
     c = norm(c)
     return "" if c in ("", "SEM COR", "UNICA", "UNICO") else c
+
+
+def cores_tab():
+    with open(os.path.join(TABELAS, "cores.csv"), encoding="utf-8") as f:
+        return sorted((norm(l) for l in f.read().split("\n")[1:] if l.strip()), key=len, reverse=True)
+
+
+def separar(desc, cores, tams):
+    """'VESTIDO MIDI LINHO OFF WHITE PP' -> ('VESTIDO MIDI LINHO', 'OFF WHITE', 'PP')"""
+    w = desc.split()
+    tam = w[-1] if w and norm_tam(w[-1]) in tams else None
+    corpo = " ".join(w[:-1] if tam else w)
+    for c in cores:
+        if norm(corpo).endswith(" " + c):
+            return corpo[: len(corpo) - len(c)].strip(), c, norm_tam(tam) if tam else "ÚNICO"
+    return corpo, None, norm_tam(tam) if tam else "ÚNICO"
 
 
 def ordem_tam(t):
@@ -98,7 +123,7 @@ def ler_planilha(path):
             ref = str(ref).strip()
             if isinstance(ws.cell(r, 7).value, float) and ws.cell(r, 7).value.is_integer():
                 ref = str(int(ws.cell(r, 7).value))
-            itens[(norm(marca), norm(ref))] = dict(
+            itens[(norm(marca), ref_key(ref))] = dict(
                 marca=marca, ref=ref, desc=ws.cell(r, 5).value or "",
                 col=ws.cell(r, 6).value or "VERÃO 27", custo=ws.cell(r, 8).value,
                 venda=ws.cell(r, 9).value, ncm=ws.cell(r, 10).value,
@@ -116,7 +141,7 @@ def ler_cadastrados(path):
     for c in ("cod", "desc", "ref", "aux"):
         ex[c] = ex[c].str.strip()
     ex["desc_n"] = ex["desc"].map(norm)
-    ex["ref_n"] = ex["ref"].map(norm)
+    ex["ref_n"] = ex["ref"].map(ref_key)
     return ex
 
 
@@ -134,13 +159,13 @@ def ultimos_codigos(ex):
 
 def aux_existente(ex, ref, dig_col, id_marca):
     """Cód. Auxiliar já usado por esta referência, na mesma coleção e marca (reposição)."""
-    m = ex[(ex.ref_n == norm(ref)) & ex.aux.str.fullmatch(dig_col + id_marca + r"\d{3}")]
+    m = ex[(ex.ref_n == ref_key(ref)) & ex.aux.str.fullmatch(dig_col + id_marca + r"\d{3}")]
     return m.aux.iloc[0] if len(m) else None
 
 
 def produto_existente(ex, ref, cor, tam, aux=None):
     """Cod.Produto do Microvix para referência + cor + tamanho, se já cadastrado."""
-    m = ex[ex.ref_n == norm(ref)]
+    m = ex[ex.ref_n == ref_key(ref)]
     if aux:
         m = m[m.aux == aux]
     if not cor and tam == "ÚNICO":
@@ -169,7 +194,7 @@ def grade_conferida(confs):
     """{(MARCA, REF): {(cor, tam): {loja: qtd}}}"""
     grade = {}
     for c in confs:
-        k = (norm(c["marca"]), norm(c["ref"]))
+        k = (norm(c["marca"]), ref_key(c["ref"]))
         for linha in c.get("linhas", []):
             cor = norm_cor(linha.get("cor", ""))
             for t, q in (linha.get("q") or {}).items():
@@ -201,3 +226,10 @@ def divergencias(confs):
             out.append(dict(loja=int(c["loja"]) + 1, marca=c["marca"], ref=c["ref"], desc=c.get("desc", ""),
                             esperado=esp, contado=total, diferenca=total - esp, obs=c.get("obs", "")))
     return out
+
+
+def nome_base_microvix(ex, aux):
+    """Nome do modelo como está no Microvix (sem cor e tamanho), o mais usado no Cód. Auxiliar."""
+    cores, tams = cores_tab(), set(tamanhos())
+    nomes = Counter(" ".join(separar(d, cores, tams)[0].split()) for d in ex.desc[ex.aux == aux])
+    return nomes.most_common(1)[0][0] if nomes else None

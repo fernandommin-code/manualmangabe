@@ -32,6 +32,19 @@ com a conferência das lojas feita por cor e tamanho no app.
 As cores já aparecem preenchidas e cada tamanho mostra o que o romaneio diz (`P · rom. 2`).
 Quando o romaneio não traz grade, a vendedora digita as cores.
 
+### Prévia (logo depois da planilha)
+
+`scripts/previa_codigos.py` mostra o Código Auxiliar que cada referência vai receber e o que é reposição.
+Também aponta o que precisa de ajuste antes do cadastro:
+- descrição genérica ("CALÇA", "TOP")
+- o mesmo nome em duas referências
+- NCM faltando
+- referência escrita diferente do Microvix (ex.: `09404` × `9404`)
+- reposição com nome diferente do cadastrado
+
+**Reposição:** o cadastro usa o nome e a referência que já estão no Microvix, para a grade não ficar com dois nomes.
+A comparação de referência ignora zeros à esquerda.
+
 ## 2–3. Conferência no app
 
 App: <https://claude.ai/artifact/Bw297fhPHqWy35JJEU1hds> (cópia em `app/conferencia.html`).
@@ -127,6 +140,9 @@ Suprimentos > Estoque > Importação de Produtos > Nova Importação, **uma impo
 
 ```bash
 pip install -r requirements.txt
+
+# prévia da planilha do dia (antes da conferência): códigos, reposições e pendências
+python3 scripts/previa_codigos.py 11_10_Cadastro_de_Produtos.xlsx Produtos_Cadastrados.xlsx Previa.xlsx
 
 # próximo código livre por marca
 python3 scripts/proximos_codigos.py Produtos_Cadastrados.xlsx

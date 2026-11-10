@@ -73,7 +73,7 @@ def test_rotina_completa(tmp_path):
     p = tmp_path / "plan.xlsx"
     planilha(p, [("FPM", [
         [3, 1, 0, None, "VESTIDO MIDI LINHO", "VERÃO 27", "9500", 159.9, 399, "62044200"],
-        [1, 1, 0, None, "BLUSA BRUNA LASTEX", "VERÃO 27", "9469", 89, 199, None],
+        [1, 1, 0, None, "BLUSA BRUNA LASTEX LISA", "VERÃO 27", "09469", 89, 199, None],  # zero à esquerda e nome diferente
         [2, 0, 0, None, "REGATA CANELADA", "VERÃO 27", "9501", 59.9, 149, None],
         [1, 0, 0, None, "PONCHO TRICO", "VERÃO 27", "9502", 99, 249, None],
     ])])
@@ -82,8 +82,8 @@ def test_rotina_completa(tmp_path):
     c = tmp_path / "conf"
     conf(c, 0, "FPM", "9500", 3, [{"cor": "PRETO", "q": {"P": 1, "M": 1}}, {"cor": "bege", "q": {"P": 1}}])
     conf(c, 1, "FPM", "9500", 1, [{"cor": "PRETO", "q": {"M": 1}}])
-    conf(c, 0, "FPM", "9469", 1, [{"cor": "OFF WHITE", "q": {"P": 1}}])            # já existe
-    conf(c, 1, "FPM", "9469", 1, [{"cor": "LILÁS", "q": {"XPP": 1}}])             # cor nova, mesmo aux
+    conf(c, 0, "FPM", "09469", 1, [{"cor": "OFF WHITE", "q": {"P": 1}}])            # já existe
+    conf(c, 1, "FPM", "09469", 1, [{"cor": "LILÁS", "q": {"XPP": 1}}])             # cor nova, mesmo aux
     conf(c, 0, "FPM", "9501", 2, [{"cor": "BRANCO", "q": {"PP": 1}}], obs="faltou 1")
     conf(c, 0, "FPM", "9502", 1, [{"cor": "CRU", "q": {"U": 1}}])
 
@@ -105,7 +105,7 @@ def test_rotina_completa(tmp_path):
     assert v["Cód. Auxiliar"] == "639033" and v["Referência"] == "9500" and v["Tamanho"] == "P"
     assert v["Cores"] == "BEGE" and v["Custo com ICMS (R$)"] == 159.9 and v["Desconto (%)"] == 15
     assert v["Preço de venda R$"] == 399 and v["NCM"] == "62044200" and v["Código de barras"] is None
-    assert rows[3]["Cód. Auxiliar"] == "639529"
+    assert rows[3]["Cód. Auxiliar"] == "639529" and rows[3]["Referência"] == "9469"  # nome e ref do Microvix
     assert len(r["ja_cadastrados"]) == 1 and r["ja_cadastrados"][0][0] == "20004"
     div = pd.read_excel(out / "Resumo_cadastro.xlsx", sheet_name="Divergências")
     assert list(div.ref.astype(str)) == ["9501"]
