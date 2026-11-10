@@ -1,0 +1,231 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Conferência Mangabê</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: sticky header with loja switch, then one collapsible block per marca with item cards that open into a cor × tamanho grid */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --line:#d9dfdc; --fg:#17211e; --muted:#5d6b66;
+  --accent:#0d6b5f; --accent-ink:#ffffff; --accent-soft:#dcefe9;
+  --ok:#1f7a3f; --ok-soft:#e1f2e5; --bad:#b4372b; --bad-soft:#f8e3e0; --warn:#9a6400; --warn-soft:#f6ecd6;
+  --sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111715; --surface:#19211e; --line:#2c3833; --fg:#e7eeeb; --muted:#9aaba4;
+  --accent:#4fb8a6; --accent-ink:#06211c; --accent-soft:#173a33;
+  --ok:#6fcf8d; --ok-soft:#173523; --bad:#f08a7e; --bad-soft:#3e1d19; --warn:#e3b45c; --warn-soft:#3a2e14; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111715; --surface:#19211e; --line:#2c3833; --fg:#e7eeeb; --muted:#9aaba4;
+  --accent:#4fb8a6; --accent-ink:#06211c; --accent-soft:#173a33;
+  --ok:#6fcf8d; --ok-soft:#173523; --bad:#f08a7e; --bad-soft:#3e1d19; --warn:#e3b45c; --warn-soft:#3a2e14; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.4}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+header .wrap{padding-block:12px;display:grid;gap:10px}
+.top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-size:19px;margin:0;font-weight:700;letter-spacing:-.01em}
+select,input,textarea,button{font:inherit;color:inherit}
+select,input[type=text],textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;min-width:0}
+.lojas{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.lojas button{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 4px;cursor:pointer;display:grid;gap:1px}
+.lojas button small{color:var(--muted);font-size:12px}
+.lojas button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.lojas button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.stats{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.stats b{color:var(--fg)}
+main .wrap{padding-block:14px 40px;display:grid;gap:12px}
+.note{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;color:var(--muted)}
+.note strong{color:var(--fg);display:block;margin-bottom:4px}
+details.marca{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+details.marca>summary{list-style:none;cursor:pointer;padding:12px 14px;display:flex;align-items:center;gap:10px}
+details.marca>summary::-webkit-details-marker{display:none}
+.mname{font-weight:700;flex:1;min-width:0}
+.mmeta{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill{font-size:12px;font-weight:600;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.p-ok{background:var(--ok-soft);color:var(--ok)}
+.p-bad{background:var(--bad-soft);color:var(--bad)}
+.p-pend{background:var(--warn-soft);color:var(--warn)}
+.p-done{background:var(--accent-soft);color:var(--accent)}
+.items{border-top:1px solid var(--line);display:grid}
+.item{border-bottom:1px solid var(--line)}
+.ihead{width:100%;background:none;border:0;text-align:left;padding:11px 14px;display:grid;grid-template-columns:1fr auto;gap:2px 10px;cursor:pointer}
+.ihead:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ref{font-family:var(--mono);font-weight:600;font-size:14px}
+.desc{color:var(--muted);font-size:13px;grid-column:1}
+.counts{grid-row:1/3;grid-column:2;align-self:center;display:grid;justify-items:end;gap:3px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ed{padding:4px 14px 14px;display:grid;gap:10px}
+.linha{border:1px solid var(--line);border-radius:10px;padding:10px;display:grid;gap:8px;background:var(--bg)}
+.lrow{display:flex;gap:8px;align-items:center}
+.lrow input{flex:1;text-transform:uppercase}
+.sizes{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px}
+.sz{display:grid;grid-template-columns:28px 1fr 28px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.sz span{grid-column:1/4;text-align:center;font-size:11px;color:var(--muted);padding-top:3px;font-weight:600}
+.sz button{border:0;background:none;height:32px;cursor:pointer;font-size:17px;color:var(--accent)}
+.sz output{text-align:center;font-family:var(--mono);font-weight:600;font-size:15px}
+.sz.has{border-color:var(--accent)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 11px;cursor:pointer;font-weight:500;font-size:14px}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.btn.ghost{border-color:transparent;background:none;color:var(--muted);padding-inline:6px}
+.btn:disabled{opacity:.5;cursor:default}
+textarea{width:100%;min-height:54px;resize:vertical}
+.sum{font-size:13px;font-variant-numeric:tabular-nums}
+.mfoot{padding:12px 14px;display:grid;gap:10px;background:var(--bg)}
+.extra{display:grid;grid-template-columns:1fr 2fr auto;gap:6px}
+@media (max-width:420px){.extra{grid-template-columns:1fr 1fr}.extra .btn{grid-column:1/3}}
+.err{color:var(--bad);font-size:13px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:9px 14px;border-radius:10px;font-size:14px;z-index:20}
+@media (prefers-reduced-motion:no-preference){.ed{animation:in .14s ease-out}@keyframes in{from{opacity:.4;transform:translateY(-3px)}}}
+</style>
+
+<header><div class="wrap">
+  <div class="top"><h1>Conferência</h1><select id="compra" aria-label="Compra"></select></div>
+  <div class="lojas" id="lojas" role="group" aria-label="Loja">
+    <button data-l="0" aria-pressed="false">Loja 1<small>Praiamar</small></button>
+    <button data-l="1" aria-pressed="false">Loja 2<small>Balneário</small></button>
+    <button data-l="2" aria-pressed="false">Loja 3<small>Miramar</small></button>
+  </div>
+  <div class="stats" id="stats"></div>
+</div></header>
+<main><div class="wrap" id="list"><div class="note"><strong>Carregando a conferência…</strong>As compras abertas aparecem aqui assim que o app conecta.</div></div></main>
+<datalist id="cores"></datalist>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const GRADES={L:["XPP","PP","P","M","G","GG"],N:["34","36","38","40","42","44","46"],U:["U"]};
+const BASE_CORES=["OFF WHITE","PRETO","AZUL","AZUL MARINHO","MARROM","AMARELO","VERDE","BEGE","ROSA","VERMELHO","CRU","LARANJA","BRANCO","MANTEIGA","PEROLA","LILAS","ROXO","CARAMELO","VINHO","DOURADO","TERRACOTA","AREIA","CREME","ÚNICA"];
+function romQ(i,cor,z){const g=(i.grade||[]).find(x=>String(x.cor||"").toUpperCase()===String(cor||"").toUpperCase());return g?+(g.q||{})[z]||0:0}
+const S={db:null,compras:[],cid:null,loja:0,marcas:[],conf:{},fech:{},open:null,draft:null,readonly:false,unsubs:[]};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const slug=s=>String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"").toUpperCase()||"X";
+function store(k,v){try{v===undefined?0:localStorage.setItem(k,v);return localStorage.getItem(k)}catch(e){return null}}
+function toast(t){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2200)}
+
+S.loja=+(store("loja")??0)||0;
+document.querySelectorAll("#lojas button").forEach(b=>b.onclick=()=>{S.loja=+b.dataset.l;store("loja",String(S.loja));S.open=null;S.draft=null;render()});
+$("#compra").onchange=e=>{S.cid=e.target.value;store("compra",S.cid);subscribe()};
+
+function confId(item){return S.loja+"~"+slug(item.marca)+"~"+slug(item.ref)}
+function total(c){let t=0;(c?.linhas||[]).forEach(l=>Object.values(l.q||{}).forEach(n=>t+=+n||0));return t}
+function itemsFor(m){
+  const base=(m.itens||[]).filter(i=>(+i.lj?.[S.loja]||0)>0).map(i=>({...i,marca:m.marca,esp:+i.lj[S.loja]}));
+  const extras=Object.values(S.conf).filter(c=>c.loja===S.loja&&c.extra&&slug(c.marca)===slug(m.marca)).map(c=>({ref:c.ref,desc:c.desc||"Fora do romaneio",marca:m.marca,esp:0,tam:c.tamKey||"L",extra:true}));
+  return base.concat(extras);
+}
+function status(item){const c=S.conf[confId(item)];if(!c)return{k:"pend",t:"pendente",n:0};const n=total(c);if(n===item.esp)return{k:"ok",t:"ok",n};return{k:"bad",t:n<item.esp?`falta ${item.esp-n}`:`sobra ${n-item.esp}`,n}}
+
+function render(){
+  document.querySelectorAll("#lojas button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.l===S.loja)));
+  const list=$("#list");
+  if(!S.db){return}
+  if(!S.compras.length){list.innerHTML=`<div class="note"><strong>Nenhuma compra aberta</strong>O Claude abre a conferência assim que a planilha de cadastro fica pronta.</div>`;$("#stats").textContent="";return}
+  const marcas=S.marcas.map(m=>({m,items:itemsFor(m)})).filter(x=>x.items.length);
+  let refs=0,feitas=0,div=0,esp=0,cont=0,mc=0;
+  marcas.forEach(({m,items})=>{items.forEach(i=>{refs++;const s=status(i);esp+=i.esp;cont+=s.n;if(s.k!=="pend")feitas++;if(s.k==="bad")div++});if(S.fech[S.loja+"~"+slug(m.marca)]?.concluida)mc++});
+  $("#stats").innerHTML=`<span><b>${feitas}/${refs}</b> referências</span><span><b>${cont}</b> de ${esp} peças</span><span><b>${div}</b> divergências</span><span><b>${mc}/${marcas.length}</b> marcas concluídas</span>`;
+  if(!marcas.length){list.innerHTML=`<div class="note"><strong>Nada para esta loja nesta compra</strong>Escolha outra loja ou outra compra.</div>`;return}
+  const keepOpen=new Set([...document.querySelectorAll("details.marca[open]")].map(d=>d.dataset.m));
+  list.innerHTML=(S.readonly?`<div class="note"><strong>Somente leitura</strong>Seu acesso permite ver, mas não lançar. Peça ao Fernando acesso de Colaborador.</div>`:"")+marcas.map(({m,items})=>marcaHTML(m,items,keepOpen)).join("");
+  bind();
+}
+function marcaHTML(m,items,keepOpen){
+  const key=S.loja+"~"+slug(m.marca),fe=S.fech[key]?.concluida;
+  let e=0,c=0,pend=0,bad=0;items.forEach(i=>{const s=status(i);e+=i.esp;c+=s.n;if(s.k==="pend")pend++;if(s.k==="bad")bad++});
+  const pill=fe?`<span class="pill p-done">concluída</span>`:pend?`<span class="pill p-pend">${pend} pendente${pend>1?"s":""}</span>`:bad?`<span class="pill p-bad">${bad} diverg.</span>`:`<span class="pill p-ok">tudo ok</span>`;
+  const open=keepOpen.has(m.marca)||(S.open&&S.open.startsWith(key+"~"));
+  return `<details class="marca" data-m="${esc(m.marca)}"${open?" open":""}><summary><span class="mname">${esc(m.marca)}</span><span class="mmeta">${c}/${e} pç</span>${pill}</summary>
+  <div class="items">${items.map(itemHTML).join("")}</div>
+  <div class="mfoot">${S.readonly?"":`<div class="extra"><input type="text" id="xr-${esc(slug(m.marca))}" placeholder="Ref. fora do romaneio" aria-label="Referência"><input type="text" id="xd-${esc(slug(m.marca))}" placeholder="Descrição" aria-label="Descrição"><button class="btn" data-act="extra" data-m="${esc(m.marca)}">+ referência</button></div>`}
+  <div class="tools">${S.readonly?"":fe?`<button class="btn" data-act="reabrir" data-m="${esc(m.marca)}">Reabrir marca</button>`:`<button class="btn primary" data-act="concluir" data-m="${esc(m.marca)}">Concluir marca</button>`}<span class="err" id="er-${esc(slug(m.marca))}"></span></div></div></details>`;
+}
+function itemHTML(i){
+  const id=confId(i),s=status(i),open=S.open===id;
+  return `<div class="item"><button class="ihead" data-act="toggle" data-id="${esc(id)}" aria-expanded="${open}"><span class="ref">${esc(i.ref)}</span><span class="counts"><span class="pill p-${s.k}">${esc(s.t)}</span><span>${s.n}/${i.esp} pç</span></span><span class="desc">${esc(i.desc||"")}${i.extra?" · fora do romaneio":""}</span></button>${open?editorHTML(i):""}</div>`;
+}
+function editorHTML(i){
+  const d=S.draft,grade=GRADES[d.tamKey]||GRADES.L,sizes=[...new Set(grade.concat(d.extraSizes||[]))];
+  const t=d.linhas.reduce((a,l)=>a+Object.values(l.q).reduce((x,y)=>x+(+y||0),0),0);
+  const diff=t-i.esp;
+  return `<div class="ed">${d.linhas.map((l,li)=>`<div class="linha"><div class="lrow"><input type="text" list="cores" id="cor-${li}" value="${esc(l.cor)}" data-cor="${li}" placeholder="Cor" aria-label="Cor"${S.readonly?" disabled":""}>${S.readonly?"":`<button class="btn ghost" data-act="rmcor" data-li="${li}" aria-label="Remover cor">remover</button>`}</div>
+    <div class="sizes">${sizes.map(z=>{const n=+l.q[z]||0,r=romQ(i,l.cor,z);return `<div class="sz${n?" has":""}"><span>${esc(z)}${r?` · rom. ${r}`:""}</span><button data-act="dec" data-li="${li}" data-z="${esc(z)}" aria-label="Menos ${esc(z)}"${S.readonly?" disabled":""}>−</button><output>${n}</output><button data-act="inc" data-li="${li}" data-z="${esc(z)}" aria-label="Mais ${esc(z)}"${S.readonly?" disabled":""}>+</button></div>`}).join("")}</div></div>`).join("")}
+    ${S.readonly?"":`<div class="tools"><button class="btn" data-act="addcor">+ cor</button><button class="btn ghost" data-act="grade">grade: ${d.tamKey==="N"?"34–46":d.tamKey==="U"?"único":"PP–GG"} ⇄</button><input type="text" id="novotam" placeholder="+ tamanho" style="width:96px" aria-label="Novo tamanho"><button class="btn ghost" data-act="addtam">ok</button></div>`}
+    <textarea id="obs" placeholder="Observação (obrigatória se não bateu)"${S.readonly?" disabled":""}>${esc(d.obs||"")}</textarea>
+    <div class="tools"><span class="sum">Contado <b>${t}</b> · romaneio ${i.esp}${diff?` · <span class="err">${diff<0?"falta "+(-diff):"sobra "+diff}</span>`:t?" · bateu":""}</span>${S.readonly?"":`<span style="flex:1"></span><button class="btn primary" data-act="salvar" data-id="${esc(confId(i))}">Salvar</button>`}</div></div>`;
+}
+function findItem(id){for(const m of S.marcas)for(const i of itemsFor(m))if(confId(i)===id)return i}
+function startDraft(id){
+  const i=findItem(id),c=S.conf[id];
+  S.draft={id,tamKey:c?.tamKey||i.tam||"L",extraSizes:c?.extraSizes||[],obs:c?.obs||"",linhas:c?.linhas?.length?JSON.parse(JSON.stringify(c.linhas)):(i.grade?.length?i.grade.map(g=>({cor:String(g.cor||"").toUpperCase(),q:{}})):[{cor:i.tam==="U"?"ÚNICA":"",q:{}}])};
+}
+function syncInputs(){if(!S.draft)return;document.querySelectorAll("[data-cor]").forEach(el=>S.draft.linhas[+el.dataset.cor].cor=el.value.toUpperCase().trim());const o=$("#obs");if(o)S.draft.obs=o.value}
+function bind(){
+  document.querySelectorAll("[data-act]").forEach(b=>b.onclick=ev=>act(b.dataset.act,b,ev));
+  document.querySelectorAll("[data-cor]").forEach(el=>el.oninput=()=>{if(S.draft)S.draft.linhas[+el.dataset.cor].cor=el.value.toUpperCase().trim()});
+  const o=$("#obs");if(o)o.oninput=()=>{if(S.draft)S.draft.obs=o.value};
+}
+async function act(a,b,ev){
+  if(a==="toggle"){syncInputs();const id=b.dataset.id;if(S.open===id){S.open=null;S.draft=null}else{S.open=id;startDraft(id)}render();return}
+  syncInputs();const d=S.draft;
+  if(a==="inc"||a==="dec"){const l=d.linhas[+b.dataset.li],z=b.dataset.z;l.q[z]=Math.max(0,(+l.q[z]||0)+(a==="inc"?1:-1));if(!l.q[z])delete l.q[z];render();return}
+  if(a==="addcor"){d.linhas.push({cor:"",q:{}});render();return}
+  if(a==="rmcor"){d.linhas.splice(+b.dataset.li,1);if(!d.linhas.length)d.linhas.push({cor:"",q:{}});render();return}
+  if(a==="grade"){d.tamKey=d.tamKey==="L"?"N":d.tamKey==="N"?"U":"L";render();return}
+  if(a==="addtam"){const v=($("#novotam").value||"").toUpperCase().trim();if(v&&!d.extraSizes.includes(v))d.extraSizes.push(v);render();return}
+  if(a==="salvar")return salvar(b.dataset.id);
+  if(a==="extra")return extra(b.dataset.m);
+  if(a==="concluir"||a==="reabrir")return fechar(b.dataset.m,a==="concluir");
+}
+function confCol(){return S.db.collection("compras/"+S.cid+"/conf")}
+async function write(ref,data){try{await ref.set(data);return true}catch(e){if(e?.code==="invalid_argument"){S.readonly=true;render();toast("Sem permissão para lançar")}else toast("Não salvou: "+(e?.message||"tente de novo"));return false}}
+async function salvar(id){
+  const i=findItem(id),d=S.draft;
+  const linhas=d.linhas.filter(l=>Object.values(l.q).some(n=>n>0)).map(l=>({cor:l.cor||"SEM COR",q:l.q}));
+  const t=linhas.reduce((a,l)=>a+Object.values(l.q).reduce((x,y)=>x+y,0),0);
+  if(t!==i.esp&&!d.obs.trim()){toast("Escreva a observação: não bateu com o romaneio");return}
+  const data={loja:S.loja,marca:i.marca,ref:i.ref,desc:i.desc||"",esperado:i.esp,extra:!!i.extra,tamKey:d.tamKey,extraSizes:d.extraSizes,linhas,obs:d.obs.trim(),total:t,em:new Date().toISOString()};
+  if(await write(confCol().doc(id),data)){S.open=null;S.draft=null;toast("Salvo");render()}
+}
+async function extra(marca){
+  const s=slug(marca),r=($("#xr-"+s).value||"").trim(),ds=($("#xd-"+s).value||"").trim();
+  if(!r){toast("Digite a referência");return}
+  const it={marca,ref:r,desc:ds,esp:0,extra:true,tam:"L"};const id=confId(it);
+  if(await write(confCol().doc(id),{loja:S.loja,marca,ref:r,desc:ds,esperado:0,extra:true,tamKey:"L",extraSizes:[],linhas:[],obs:"Veio sem estar no romaneio",total:0,em:new Date().toISOString()})){S.open=id;startDraft(id);render()}
+}
+async function fechar(marca,on){
+  const m=S.marcas.find(x=>x.marca===marca),items=itemsFor(m),er=$("#er-"+slug(marca));
+  if(on){const pend=items.filter(i=>status(i).k==="pend");if(pend.length){er.textContent=`Faltam ${pend.length}: ${pend.map(i=>i.ref).join(", ")}`;return}
+    const semObs=items.filter(i=>status(i).k==="bad"&&!S.conf[confId(i)]?.obs);if(semObs.length){er.textContent="Diverg. sem observação: "+semObs.map(i=>i.ref).join(", ");return}}
+  const ref=S.db.collection("compras/"+S.cid+"/fechamento").doc(S.loja+"~"+slug(marca));
+  if(await write(ref,{loja:S.loja,marca,concluida:on,em:new Date().toISOString()}))toast(on?"Marca concluída":"Marca reaberta");
+}
+function subscribe(){
+  S.unsubs.forEach(u=>u());S.unsubs=[];S.marcas=[];S.conf={};S.fech={};S.open=null;S.draft=null;
+  if(!S.cid){render();return}
+  const base="compras/"+S.cid;
+  const onErr=e=>{if(e?.code==="revoked"){$("#list").innerHTML=`<div class="note"><strong>Acesso encerrado</strong>Recarregue a página.</div>`}};
+  S.unsubs.push(S.db.collection(base+"/marcas").orderBy("ordem").onSnapshot(q=>{S.marcas=q.docs.map(d=>d.data());render()},onErr));
+  S.unsubs.push(S.db.collection(base+"/conf").onSnapshot(q=>{S.conf={};q.docs.forEach(d=>S.conf[d.id]=d.data());
+    const cs=new Set(BASE_CORES);Object.values(S.conf).forEach(c=>(c.linhas||[]).forEach(l=>l.cor&&cs.add(l.cor)));$("#cores").innerHTML=[...cs].map(c=>`<option value="${esc(c)}">`).join("");
+    if(!S.draft)render();else{const k=document.activeElement?.id;render();if(k)document.getElementById(k)?.focus()}},onErr));
+  S.unsubs.push(S.db.collection(base+"/fechamento").onSnapshot(q=>{S.fech={};q.docs.forEach(d=>S.fech[d.id]=d.data());render()},onErr));
+}
+(async()=>{
+  const db=await window.claude?.use?.("db");
+  if(!db){$("#list").innerHTML=`<div class="note"><strong>Abra pelo link compartilhado, logada na sua conta</strong>A conferência só funciona dentro do Claude, onde os lançamentos ficam salvos para todas as lojas.</div>`;return}
+  S.db=db;
+  try{const u=await window.claude.use("user");const w=await u?.can?.("data.write");if(w===false)S.readonly=true}catch(e){}
+  db.collection("compras").onSnapshot(q=>{
+    S.compras=q.docs.map(d=>({id:d.id,...d.data()})).filter(c=>c.aberta!==false).sort((a,b)=>String(b.data).localeCompare(String(a.data)));
+    const sel=$("#compra");sel.innerHTML=S.compras.map(c=>`<option value="${esc(c.id)}">${esc(c.titulo||c.id)}</option>`).join("");
+    const want=S.cid||store("compra");const pick=S.compras.find(c=>c.id===want)?want:S.compras[0]?.id||null;
+    sel.value=pick||"";if(pick!==S.cid){S.cid=pick;subscribe()}else render();
+  },e=>{});
+})();
+</script>
+
+</body></html>
