@@ -142,6 +142,10 @@ python3 scripts/gerar_entrada.py --conf conf/ --planilha 11_10_Cadastro_de_Produ
 
 # testes
 python3 -m pytest tests/
+
+# teste com o histórico real (não mexe no Microvix): refaz as últimas referências
+# de cada marca e compara com o que está cadastrado; também revisa o cadastro
+python3 scripts/simular_com_historico.py Produtos_Cadastrados.xlsx ModeloImportacaoProduto.xlsx saida_teste/
 ```
 
 `conf/` e `fech/` são os JSON exportados do app (`compras/<id>/conf` e `compras/<id>/fechamento`).

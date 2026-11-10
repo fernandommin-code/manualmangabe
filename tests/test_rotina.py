@@ -99,13 +99,13 @@ def test_rotina_completa(tmp_path):
     hdr = [(x.value or "").strip() for x in ws[1]]
     rows = [dict(zip(hdr, [x.value for x in row])) for row in ws.iter_rows(min_row=2)]
     descs = [x["Descrição"] for x in rows]
-    assert descs == ["BLUSA BRUNA LASTEX LILAS XPP", "VESTIDO MIDI LINHO BEGE P", "VESTIDO MIDI LINHO PRETO P",
-                     "VESTIDO MIDI LINHO PRETO M", "REGATA CANELADA BRANCO PP", "PONCHO TRICO CRU ÚNICO"]
-    v = rows[1]
+    assert descs == ["VESTIDO MIDI LINHO BEGE P", "VESTIDO MIDI LINHO PRETO P", "VESTIDO MIDI LINHO PRETO M",
+                     "BLUSA BRUNA LASTEX LILAS XPP", "REGATA CANELADA BRANCO PP", "PONCHO TRICO CRU ÚNICO"]
+    v = rows[0]
     assert v["Cód. Auxiliar"] == "639033" and v["Referência"] == "9500" and v["Tamanho"] == "P"
     assert v["Cores"] == "BEGE" and v["Custo com ICMS (R$)"] == 159.9 and v["Desconto (%)"] == 15
     assert v["Preço de venda R$"] == 399 and v["NCM"] == "62044200" and v["Código de barras"] is None
-    assert rows[0]["Cód. Auxiliar"] == "639529"
+    assert rows[3]["Cód. Auxiliar"] == "639529"
     assert len(r["ja_cadastrados"]) == 1 and r["ja_cadastrados"][0][0] == "20004"
     div = pd.read_excel(out / "Resumo_cadastro.xlsx", sheet_name="Divergências")
     assert list(div.ref.astype(str)) == ["9501"]
@@ -121,7 +121,7 @@ def test_rotina_completa(tmp_path):
     with open(out / "Entrada_Loja1.csv", encoding="utf-8-sig") as f:
         l1 = {r["Cod.Produto"]: int(r["Quantidade"]) for r in csv.DictReader(f, delimiter=";")}
     assert l1["20004"] == 1 and "20005" not in l1
-    assert open(out / "Entrada_Loja2.txt").read().split() == ["30000", "30003"]
+    assert open(out / "Entrada_Loja2.txt").read().split() == ["30002", "30003"]
 
 
 def test_parte_da_peca():

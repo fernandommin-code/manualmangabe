@@ -50,7 +50,8 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
         if k not in grade and sum(it["lj"]):
             pend.append(["Referência sem conferência (não cadastrada)", it["marca"], it["ref"], it["desc"]])
 
-    for k in sorted(grade, key=lambda k: (itens.get(k, {}).get("marca", k[0]), k[1])):
+    ordem = {k: i for i, k in enumerate(itens)}  # mesma ordem da planilha (= ordem do romaneio)
+    for k in sorted(grade, key=lambda k: (ordem.get(k, len(ordem)), k)):
         g = grade[k]
         it = itens.get(k)
         if not it:
@@ -67,6 +68,11 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
 
         aux = mg.aux_existente(ex, it["ref"], dig, tm["id"])
         origem = "reposição (código existente)"
+        if aux:
+            nomes = ex.desc_n[ex.aux == aux]
+            if not any(d.startswith(mg.norm(it["desc"]) + " ") for d in nomes):
+                pend.append(["Reposição com nome diferente do Microvix (a grade fica com dois nomes) — conferir",
+                             it["marca"], it["ref"], f"planilha: {it['desc']} | Microvix: {nomes.iloc[0]}"])
         if not aux:
             parte = mg.parte_da_peca(it["desc"])
             if parte is None:
