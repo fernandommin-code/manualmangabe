@@ -20,6 +20,23 @@ def norm(s):
     return " ".join(s.upper().split())
 
 
+def num(x):
+    """Número do relatório do Microvix ('1.079,00' ou '1079.00')."""
+    x = str(x or "0").strip()
+    if "," in x:
+        x = x.replace(".", "").replace(",", ".")
+    try:
+        return float(x)
+    except ValueError:
+        return 0.0
+
+
+def custo_liquido(bruto, desconto):
+    """Bruto − desconto da marca, truncado no centavo como o Microvix (129,90 − 15% = 110,41)."""
+    import math
+    return math.floor(float(bruto) * (1 - (desconto or 0) / 100) * 100 + 1e-6) / 100
+
+
 def ref_key(s):
     """Chave de comparação da referência: sem acento, maiúscula e sem zeros à esquerda (09404 = 9404)."""
     return norm(s).lstrip("0") or "0"

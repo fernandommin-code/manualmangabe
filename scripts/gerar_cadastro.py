@@ -111,11 +111,21 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
         for cor, tam in sorted(g, key=lambda x: (x[0], mg.ordem_tam(x[1]))):
             desc = mg.descricao_produto(desc_base, cor, tam)
             q = g[(cor, tam)]
+            liq = mg.custo_liquido(it["custo"], tm["desconto"])
             cod = mg.produto_existente(ex, ref_out, cor, tam, aux)
+            row = [None] * len(hdr)
             if cod:
                 ja_cad.append([cod, desc, it["ref"], aux, q.get(0, 0), q.get(1, 0), q.get(2, 0)])
-                continue
-            row = [None] * len(hdr)
+                atual = ex[ex.cod == cod].iloc[0]
+                if abs(mg.num(atual.custo) - liq) <= 0.05:
+                    continue
+                # repique com custo de outra compra: atualiza o custo pelo Código, mantendo o preço atual
+                row[col["Código"]] = int(cod)
+                pend.append(["Repique com custo atualizado pelo Código (preço mantido)", it["marca"], it["ref"],
+                             f"{desc}: {mg.num(atual.custo):.2f} -> {liq:.2f}"])
+                if abs(mg.num(atual.venda) - float(it["venda"] or 0)) > 0.5:
+                    pend.append(["Preço da planilha diferente do Microvix (mantido o do Microvix)", it["marca"],
+                                 it["ref"], f"{desc}: Microvix {mg.num(atual.venda):.2f} | planilha {it['venda']}"])
 
             def put(nome, v):
                 row[col[nome]] = v
@@ -128,12 +138,11 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
             put("Tamanho", tam)
             put("Cores", cor or None)
             put("Contabiliza saldo em estoque", "Sim")
-            # custo BRUTO (igual ao romaneio/nota) + Desconto da marca. Na entrada de estoque o desconto
-            # é aplicado no fim, como na nota, e ao finalizar o Microvix grava o custo líquido no produto.
-            # Não mandar custo já líquido: o desconto sairia duas vezes.
-            put("Custo com ICMS (R$)", it["custo"])
-            put("Desconto (%)", tm["desconto"] or None)
-            put("Preço de venda R$", it["venda"])
+            # custo LÍQUIDO e Desconto 0: numa entrada com repiques (já líquidos) e produtos novos,
+            # o desconto no fim da nota pegaria todos; com tudo líquido, a entrada não leva desconto.
+            put("Custo com ICMS (R$)", liq)
+            put("Desconto (%)", 0)
+            put("Preço de venda R$", mg.num(atual.venda) if cod else it["venda"])
             if it["ncm"]:
                 put("NCM", str(it["ncm"]))
             for nome, v in padroes.items():

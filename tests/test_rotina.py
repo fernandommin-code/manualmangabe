@@ -97,14 +97,18 @@ def test_rotina_completa(tmp_path):
     assert aux["9502"] == "639531"      # poncho: parte de cima
     ws = openpyxl.load_workbook(out / "Importacao_FPM.xlsx").active
     hdr = [(x.value or "").strip() for x in ws[1]]
-    rows = [dict(zip(hdr, [x.value for x in row])) for row in ws.iter_rows(min_row=2)]
+    todas = [dict(zip(hdr, [x.value for x in row])) for row in ws.iter_rows(min_row=2)]
+    # repique com custo de outra compra (89 bruto no cadastro x 75,65 líquido agora) volta com o Código
+    upd = [r for r in todas if r["Código"]]
+    assert [(r["Código"], r["Custo com ICMS (R$)"], r["Preço de venda R$"]) for r in upd] == [(20004, 75.65, 199.0)]
+    rows = [r for r in todas if not r["Código"]]
     assert rows[0]["Descrição"] == "VESTIDO MIDI LINHO"  # o Microvix acrescenta cor e tamanho
     descs = [mg.descricao_produto(x["Descrição"], x["Cores"], x["Tamanho"]) for x in rows]  # nome final no Microvix
     assert descs == ["VESTIDO MIDI LINHO BEGE P", "VESTIDO MIDI LINHO PRETO P", "VESTIDO MIDI LINHO PRETO M",
                      "BLUSA BRUNA LASTEX LILAS XPP", "REGATA CANELADA BRANCO PP", "PONCHO TRICO CRU ÚNICO"]
     v = rows[0]
     assert v["Cód. Auxiliar"] == "639033" and v["Referência"] == "9500" and v["Tamanho"] == "P"
-    assert v["Cores"] == "BEGE" and v["Custo com ICMS (R$)"] == 159.9 and v["Desconto (%)"] == 15
+    assert v["Cores"] == "BEGE" and v["Custo com ICMS (R$)"] == 135.91 and v["Desconto (%)"] == 0
     assert v["Preço de venda R$"] == 399 and v["NCM"] == "62044200" and v["Código de barras"] is None
     assert rows[3]["Cód. Auxiliar"] == "639529" and rows[3]["Referência"] == "9469"  # nome e ref do Microvix
     assert len(r["ja_cadastrados"]) == 1 and r["ja_cadastrados"][0][0] == "20004"
