@@ -128,8 +128,10 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
             put("Tamanho", tam)
             put("Cores", cor or None)
             put("Contabiliza saldo em estoque", "Sim")
-            put("Custo com ICMS (R$)", it["custo"])
-            put("Desconto (%)", tm["desconto"] or None)
+            # custo já líquido (bruto − desconto da marca) e Desconto 0: a entrada de estoque do Microvix
+            # usa o "Custo com ICMS" e ignora o Desconto (%) — testado na FPM em 11/11
+            put("Custo com ICMS (R$)", round(float(it["custo"]) * (1 - (tm["desconto"] or 0) / 100), 2))
+            put("Desconto (%)", 0)
             put("Preço de venda R$", it["venda"])
             if it["ncm"]:
                 put("NCM", str(it["ncm"]))
