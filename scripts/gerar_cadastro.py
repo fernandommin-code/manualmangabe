@@ -166,6 +166,8 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
         pd.DataFrame(pend, columns=["Pendência", "Marca", "Referência", "Detalhe"]).to_excel(
             w, sheet_name="Pendências", index=False)
 
+    for ref, cor, tam, cods, usado in mg.REPETIDOS:
+        print(f"  ! Produto repetido no Microvix: ref {ref} {cor} {tam} -> {', '.join(cods)} (usado {usado})")
     novos = {m: len(r) for m, r in por_marca.items()}
     print("Produtos novos (cor × tamanho) por marca:", novos)
     print("Já cadastrados (só entrada):", len(ja_cad))

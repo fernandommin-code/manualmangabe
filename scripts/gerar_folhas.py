@@ -25,6 +25,8 @@ TAMS = ["XPP\n34", "PP\n36", "P\n38", "M\n40", "G\n42", "GG\n44"]
 CINZA = colors.HexColor("#9a9a9a")
 FUNDO = colors.HexColor("#ececec")
 LINHA = colors.HexColor("#444444")
+CORES = mg.cores_tab()
+TAMSET = set(mg.tamanhos())
 
 st_desc = ParagraphStyle("d", fontName="Helvetica", fontSize=8.5, leading=10)
 st_ref = ParagraphStyle("r", fontName="Helvetica-Bold", fontSize=10.5, leading=12)
@@ -47,7 +49,7 @@ def cabecalho_tabela():
     return ["Ref.", "Descrição", "Rom.", "Cor (por extenso)"] + TAMS + ["Outro", "Total", "Obs."]
 
 
-def bloco_marca(marca, itens, loja):
+def bloco_marca(marca, itens, loja, ex=None):
     unico = mg.norm(marca) == "VICKY"
     dados = [[Paragraph(f"<b>{marca}</b>", ParagraphStyle("m", fontName="Helvetica-Bold", fontSize=11)),
               "", "", ""] + [""] * 8 + [f"esperado: {sum(i['lj'][loja] for i in itens)} pç"],
@@ -67,7 +69,15 @@ def bloco_marca(marca, itens, loja):
         n = linhas_por_ref(q, unico)
         for k in range(n):
             if k == 0:
-                linha = [Paragraph(it["ref"], st_ref), Paragraph(it["desc"], st_desc), str(q)]
+                desc = it["desc"]
+                if ex is not None:
+                    tm = mg.marcas().get(mg.norm(marca))
+                    dig = mg.colecoes().get(mg.norm(it["col"]))
+                    aux = mg.aux_existente(ex, it["ref"], dig, tm["id"]) if tm and dig else None
+                    if aux:
+                        cs = sorted({mg.separar(d, CORES, TAMSET)[1] or "?" for d in ex.desc[ex.aux == aux]})
+                        desc += f'<br/><font size="6.5" color="#777777">já no sistema: {", ".join(cs)}</font>'
+                linha = [Paragraph(it["ref"], st_ref), Paragraph(desc, st_desc), str(q)]
             else:
                 linha = [Paragraph(it["ref"], st_cont), "", ""]
             linha += [""] * 10
@@ -104,8 +114,9 @@ def bloco_marca(marca, itens, loja):
     return t
 
 
-def gerar(planilha, saida, data=None):
+def gerar(planilha, saida, data=None, cadastrados=None):
     itens = mg.ler_planilha(planilha)
+    ex = mg.ler_cadastrados(cadastrados) if cadastrados else None
     marcas = {}
     for it in itens.values():
         marcas.setdefault(it["marca"], []).append(it)
@@ -119,7 +130,7 @@ def gerar(planilha, saida, data=None):
             if not its:
                 continue
             total += sum(i["lj"][loja] for i in its)
-            t = bloco_marca(marca, its, loja)
+            t = bloco_marca(marca, its, loja, ex)
             blocos.append(KeepTogether([t]) if len(its) <= 8 else t)
             blocos.append(Spacer(1, 5 * mm))
         if not blocos:
@@ -161,5 +172,6 @@ if __name__ == "__main__":
     ap.add_argument("planilha")
     ap.add_argument("saida")
     ap.add_argument("--data")
+    ap.add_argument("--cadastrados", help="relatório Produtos Cadastrados: mostra as cores já existentes nas reposições")
     a = ap.parse_args()
-    gerar(a.planilha, a.saida, a.data)
+    gerar(a.planilha, a.saida, a.data, a.cadastrados)

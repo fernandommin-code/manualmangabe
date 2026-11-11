@@ -70,6 +70,8 @@ def gerar(conf_dir, cadastrados, saida, planilha=None):
             w = csv.writer(f, delimiter=";")
             w.writerow(["Marca", "Referência", "Cor", "Tamanho", "Lj 1", "Lj 2", "Lj 3"])
             w.writerows(nao)
+    for ref, cor, tam, cods, usado in mg.REPETIDOS:
+        print(f"  ! Produto repetido no Microvix: ref {ref} {cor} {tam} -> {', '.join(cods)} (usado {usado})")
     print("Peças por loja:", resumo)
     print("Não encontrados no Microvix:", len(nao))
     for n in nao:

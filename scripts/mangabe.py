@@ -181,18 +181,35 @@ def aux_existente(ex, ref, dig_col, id_marca):
     return m.aux.iloc[0] if len(m) else None
 
 
-def produto_existente(ex, ref, cor, tam, aux=None):
-    """Cod.Produto do Microvix para referência + cor + tamanho, se já cadastrado."""
+def produtos_existentes(ex, ref, cor, tam, aux=None):
+    """Todos os Cod.Produto do Microvix para referência + cor + tamanho (mais de um = repetido no cadastro)."""
     m = ex[ex.ref_n == ref_key(ref)]
     if aux:
         m = m[m.aux == aux]
     if not cor and tam == "ÚNICO":
-        return m.cod.iloc[0] if len(m) == 1 else None
+        return list(m.cod) if len(m) == 1 else []
     fim = norm(f"{cor} {tam}" if cor else tam)
-    for d, c in zip(m.desc_n, m.cod):
-        if d == fim or d.endswith(" " + fim):
-            return c
-    return None
+    return [c for d, c in zip(m.desc_n, m.cod) if d == fim or d.endswith(" " + fim)]
+
+
+REPETIDOS = []  # (ref, cor, tam, [códigos]) encontrados na última consulta
+
+
+def produto_existente(ex, ref, cor, tam, aux=None):
+    """Cod.Produto do Microvix para referência + cor + tamanho, se já cadastrado.
+    Se houver repetido, prefere o que tem o nome principal do modelo e registra em REPETIDOS."""
+    cods = produtos_existentes(ex, ref, cor, tam, aux)
+    if len(cods) <= 1:
+        return cods[0] if cods else None
+    base = norm(nome_base_microvix(ex, aux)) if aux else None
+    melhor = cods[0]
+    for c in cods:
+        d = ex.desc_n[ex.cod == c].iloc[0]
+        if base and d.startswith(base + " ") and len(d.split()) == len(base.split()) + len(f"{cor} {tam}".split()):
+            melhor = c
+            break
+    REPETIDOS.append((ref, cor, tam, cods, melhor))
+    return melhor
 
 
 # ---------------------------------------------------------------- conferência do app
