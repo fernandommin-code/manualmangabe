@@ -125,7 +125,7 @@ A primeira blusa é `639500`.
 | Referência | referência do fornecedor |
 | Cód. Auxiliar | regra acima |
 | Marca, Coleção, Tamanho, Cores | da planilha e da conferência |
-| Custo com ICMS (R$) | custo **líquido**: bruto × (1 − desconto da marca, `tabelas/marcas.csv`) |
+| Custo com ICMS (R$) | custo bruto (igual ao romaneio e à nota) |
 | Desconto (%) | desconto da marca (`tabelas/marcas.csv`), para o produto já nascer com custo líquido |
 | Preço de venda R$ | da planilha |
 | NCM | da planilha, quando houver |

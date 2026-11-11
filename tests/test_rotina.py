@@ -104,7 +104,7 @@ def test_rotina_completa(tmp_path):
                      "BLUSA BRUNA LASTEX LILAS XPP", "REGATA CANELADA BRANCO PP", "PONCHO TRICO CRU ÚNICO"]
     v = rows[0]
     assert v["Cód. Auxiliar"] == "639033" and v["Referência"] == "9500" and v["Tamanho"] == "P"
-    assert v["Cores"] == "BEGE" and v["Custo com ICMS (R$)"] == 135.91 and v["Desconto (%)"] == 0
+    assert v["Cores"] == "BEGE" and v["Custo com ICMS (R$)"] == 159.9 and v["Desconto (%)"] == 15
     assert v["Preço de venda R$"] == 399 and v["NCM"] == "62044200" and v["Código de barras"] is None
     assert rows[3]["Cód. Auxiliar"] == "639529" and rows[3]["Referência"] == "9469"  # nome e ref do Microvix
     assert len(r["ja_cadastrados"]) == 1 and r["ja_cadastrados"][0][0] == "20004"
