@@ -68,6 +68,11 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
     col = {h: i for i, h in enumerate(hdr)}
 
     por_marca, codigos, ja_cad, pend = {}, [], [], []
+    padroes = mg.padroes_microvix()
+    faltando = [c for c in mg.OBRIGATORIAS if c != "Fornecedor" and not padroes.get(c)]
+    if faltando:
+        pend.append(["Coluna obrigatória do Microvix sem valor em tabelas/padroes_microvix.csv", "", "",
+                     ", ".join(faltando)])
 
     # pendências de fechamento / conferência
     if fech_dir:
@@ -96,6 +101,9 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
             desc_base = mg.nome_base_microvix(ex, aux) or desc_base
             ref_out = ex.ref[ex.aux == aux].iloc[0]
         codigos.append([it["marca"], ref_out, desc_base, aux, origem])
+        if not tm["fornecedor"] and not any(p[0].startswith("Marca sem fornecedor") and p[1] == it["marca"] for p in pend):
+            pend.append(["Marca sem fornecedor em tabelas/marcas.csv (coluna obrigatória no Microvix)",
+                         it["marca"], "", ""])
 
         for cor, tam in sorted(g, key=lambda x: (x[0], mg.ordem_tam(x[1]))):
             desc = mg.descricao_produto(desc_base, cor, tam)
@@ -122,6 +130,11 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
             put("Preço de venda R$", it["venda"])
             if it["ncm"]:
                 put("NCM", str(it["ncm"]))
+            for nome, v in padroes.items():
+                if v and nome in col:
+                    put(nome, v)
+            if tm["fornecedor"]:
+                put("Fornecedor", tm["fornecedor"])
             por_marca.setdefault(it["marca"], []).append(row)
 
     os.makedirs(saida, exist_ok=True)

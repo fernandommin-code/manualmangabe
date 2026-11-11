@@ -133,12 +133,15 @@ fica com o custo cheio no Microvix.
 
 ## 6. Importar no Microvix (moça do cadastro)
 
-Suprimentos > Estoque > Importação de Produtos > Nova Importação, **uma importação por marca**:
+Suprimentos > Estoque > Importação de Produtos > Nova Importação, **uma importação por marca**.
 
-1. Enviar o `Importacao_<MARCA>.xlsx`.
-2. Em **Valores padrão**, escolher Fornecedor, Comprador, Configuração tributária, Setor,
-   Linha, Unidade e Empresa. O arquivo não traz esses campos.
-3. Se aparecer erro, "Gerar Arquivo com Inconsistências" e mandar o arquivo para o Claude ajustar.
+O Microvix recusa a linha se faltar **Fornecedor, Configuração tributária, Unidade de venda,
+Setor, Linha ou Espessura** (teste da GULE em 10/11). Por isso o arquivo já sai com essas colunas preenchidas:
+- `tabelas/padroes_microvix.csv`: valores iguais para todos os produtos (escritos exatamente como no Microvix)
+- `tabelas/marcas.csv`, coluna `fornecedor_microvix`: o fornecedor de cada marca
+
+Se alguma estiver vazia, o `Resumo_cadastro.xlsx` avisa em Pendências.
+Se der erro, clicar em "Visualizar inconsistências" e mandar um print com o motivo de cada linha.
 
 ## 7–8. Entrada de estoque
 

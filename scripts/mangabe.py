@@ -39,8 +39,17 @@ def marcas():
     out = {}
     for r in _csv("marcas.csv"):
         d = r["desconto_compra"].strip()
-        out[norm(r["marca"])] = {"id": r["id"].zfill(2), "desconto": float(d) if d else 0.0}
+        out[norm(r["marca"])] = {"id": r["id"].zfill(2), "desconto": float(d) if d else 0.0,
+                                 "fornecedor": (r.get("fornecedor_microvix") or "").strip()}
     return out
+
+
+def padroes_microvix():
+    """Valores fixos que o Microvix exige em todo produto (tabelas/padroes_microvix.csv)."""
+    return {r["coluna"].strip(): r["valor"].strip() for r in _csv("padroes_microvix.csv")}
+
+
+OBRIGATORIAS = ["Fornecedor", "Configuração tributária", "Unidade de venda", "Setor", "Linha", "Espessura"]
 
 
 def colecoes():
