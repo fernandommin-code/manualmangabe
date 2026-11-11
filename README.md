@@ -131,6 +131,12 @@ A primeira blusa é `639500`.
 Só entra o que foi **conferido**. Tamanho que não chegou não é cadastrado: produto sem entrada
 fica com o custo cheio no Microvix.
 
+> **Atenção — o Microvix reconhece o produto pelo Código Auxiliar.** Se o arquivo trouxer um
+> Código Auxiliar que já existe, a importação **altera** os produtos existentes (amarelo = alterados)
+> em vez de criar novos. Por isso o relatório Produtos Cadastrados usado para numerar tem que ser
+> **exportado no mesmo dia, completo (Verão 27, sem filtro de data)**, depois de qualquer cadastro manual.
+> Com a coluna Código preenchida, a importação altera aquele produto (serve para corrigir nomes).
+
 ## 6. Importar no Microvix (moça do cadastro)
 
 Suprimentos > Estoque > Importação de Produtos > Nova Importação, **uma importação por marca**.
