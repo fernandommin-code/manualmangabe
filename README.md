@@ -45,7 +45,22 @@ Também aponta o que precisa de ajuste antes do cadastro:
 **Reposição:** o cadastro usa o nome e a referência que já estão no Microvix, para a grade não ficar com dois nomes.
 A comparação de referência ignora zeros à esquerda.
 
-## 2–3. Conferência no app
+## 2–3. Conferência — folha impressa (padrão) ou app
+
+### Folha já preenchida
+
+`scripts/gerar_folhas.py` gera um PDF por loja (A4 deitado) a partir da planilha do dia.
+Vêm impressos a marca, a referência, a descrição e a quantidade do romaneio daquela loja.
+As vendedoras escrevem só a **cor** (uma linha por cor) e as quantidades por tamanho
+(XPP/34 até GG/44, "Outro" para tamanhos fora da grade).
+Peça que não está na lista vai nas linhas "fora do rom." de cada marca.
+A Vicky tem uma linha por referência, só com a quantidade.
+
+Depois de conferir, mandam a foto das folhas. O Claude transcreve para o mesmo formato do app
+(`compras/<id>/conf`) e segue para as divergências e o cadastro.
+
+### App (opcional)
+
 
 App: <https://claude.ai/artifact/Bw297fhPHqWy35JJEU1hds> (cópia em `app/conferencia.html`).
 As vendedoras precisam de acesso de **Colaborador**.
@@ -143,6 +158,9 @@ pip install -r requirements.txt
 
 # prévia da planilha do dia (antes da conferência): códigos, reposições e pendências
 python3 scripts/previa_codigos.py 11_10_Cadastro_de_Produtos.xlsx Produtos_Cadastrados.xlsx Previa.xlsx
+
+# folhas de conferência já preenchidas (uma por loja)
+python3 scripts/gerar_folhas.py 11_10_Cadastro_de_Produtos.xlsx folhas/ --data 10/11
 
 # próximo código livre por marca
 python3 scripts/proximos_codigos.py Produtos_Cadastrados.xlsx
