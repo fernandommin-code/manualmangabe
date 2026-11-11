@@ -97,7 +97,7 @@ textarea{width:100%;min-height:54px;resize:vertical}
 
 <script>
 const GRADES={L:["XPP","PP","P","M","G","GG"],N:["34","36","38","40","42","44","46"],U:["U"]};
-const BASE_CORES=["OFF WHITE","PRETO","AZUL","AZUL MARINHO","MARROM","AMARELO","VERDE","BEGE","ROSA","VERMELHO","CRU","LARANJA","BRANCO","MANTEIGA","PEROLA","LILAS","ROXO","CARAMELO","VINHO","DOURADO","TERRACOTA","AREIA","CREME","JEANS","MARFIM","ÚNICA"];
+const BASE_CORES=["OFF WHITE","PRETO","AZUL","AZUL MARINHO","MARROM","AMARELO","VERDE","BEGE","ROSA","VERMELHO","CRU","LARANJA","BRANCO","MANTEIGA","PEROLA","LILAS","ROXO","CARAMELO","VINHO","DOURADO","TERRACOTA","AREIA","CREME","JEANS","MARFIM","PRATA","ÚNICA"];
 function romQ(i,cor,z){const g=(i.grade||[]).find(x=>String(x.cor||"").toUpperCase()===String(cor||"").toUpperCase());return g?+(g.q||{})[z]||0:0}
 const S={db:null,compras:[],cid:null,loja:0,marcas:[],conf:{},fech:{},open:null,draft:null,readonly:false,unsubs:[]};
 const $=s=>document.querySelector(s);
