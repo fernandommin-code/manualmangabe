@@ -10,8 +10,8 @@ Uso:
 
 Saídas em --saida:
   Entrada_Loja1.csv / Loja2 / Loja3   Cod.Produto;Descrição;Quantidade
-  Entrada_Loja1.txt / ...             um código por peça, uma linha por peça (Recebimento de Compras)
-  Entrada_Loja1_manual.txt / ...      Cod.Produto;Quantidade;Valor Despesas (Entrada Manual / Entradas e Retornos)
+  Entrada_Loja1.txt / ...             ARQUIVO PARA O MICROVIX: um código por linha, uma linha por peça
+                                      (testado na GULE em 11/11; "cod;qtd" não é aceito)
   Entrada_nao_encontrados.csv         grade conferida que não achou produto no Microvix
 """
 import argparse
@@ -64,10 +64,6 @@ def gerar(conf_dir, cadastrados, saida, planilha=None):
         with open(base + ".txt", "w", encoding="utf-8") as f:
             for cod, (_, n) in sorted(prods.items()):
                 f.write((cod + "\n") * n)
-        # Entrada Manual / Entradas e Retornos: Cod.Produto/Barras;Quantidade;Valor Despesas
-        with open(base + "_manual.txt", "w", encoding="utf-8") as f:
-            for cod, (_, n) in sorted(prods.items()):
-                f.write(f"{cod};{n};0\n")
         resumo[loja + 1] = sum(n for _, n in prods.values())
     if nao:
         with open(os.path.join(saida, "Entrada_nao_encontrados.csv"), "w", newline="", encoding="utf-8-sig") as f:

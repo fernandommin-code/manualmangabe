@@ -161,7 +161,7 @@ Se der erro, clicar em "Visualizar inconsistências" e mandar um print com o mot
    - `Entrada_LojaN.csv`: `Cod.Produto;Descrição;Quantidade`
    - `Entrada_LojaN.txt`: um Cod.Produto por peça, para leitura em lote
    - `Entrada_nao_encontrados.csv`: o que não achou produto (normalmente cor escrita diferente)
-3. Dar a entrada em cada loja.
+3. Dar a entrada em cada loja importando o `Entrada_LojaN.txt`: **um código por linha, uma linha por peça** (testado na GULE em 11/11). O formato `código;quantidade` não é aceito.
 
 ---
 
