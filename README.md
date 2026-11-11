@@ -136,6 +136,11 @@ fica com o custo cheio no Microvix.
 > em vez de criar novos. Por isso o relatório Produtos Cadastrados usado para numerar tem que ser
 > **exportado no mesmo dia, completo (Verão 27, sem filtro de data)**, depois de qualquer cadastro manual.
 > Com a coluna Código preenchida, a importação altera aquele produto (serve para corrigir nomes).
+>
+> **Identificador dos Produtos = "Código do produto"** (sempre). Linhas sem Código são criadas;
+> linhas com Código alteram aquele produto. Nunca usar "Referência" nem "Código auxiliar": toda a grade
+> de um modelo tem a mesma referência e o mesmo código auxiliar, e o Microvix junta tudo num produto só.
+> Resultado certo da GULE (11/11): 18 verdes (criados), 11 amarelos (alterados), 0 vermelhos.
 
 ## 6. Importar no Microvix (moça do cadastro)
 
