@@ -65,6 +65,15 @@ def tipos_peca():
     return {norm(r["palavra"]): r["parte"] for r in _csv("tipos_peca.csv")}
 
 
+def linha_da_peca(desc):
+    """Linha do Microvix (REGATA, VESTIDO, CALÇA…): a da 1ª palavra conhecida da descrição."""
+    linhas = {norm(r["palavra"]): (r.get("linha") or r["palavra"]).strip() for r in _csv("tipos_peca.csv")}
+    for w in norm(desc).split():
+        if w in linhas:
+            return linhas[w]
+    return None
+
+
 def parte_da_peca(desc):
     """'cima' (500–999) ou 'baixo' (000–499, inclui peça única). None se a 1ª palavra não estiver na tabela."""
     tipos = tipos_peca()

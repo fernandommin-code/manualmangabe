@@ -69,7 +69,7 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
 
     por_marca, codigos, ja_cad, pend = {}, [], [], []
     padroes = mg.padroes_microvix()
-    faltando = [c for c in mg.OBRIGATORIAS if c != "Fornecedor" and not padroes.get(c)]
+    faltando = [c for c in mg.OBRIGATORIAS if c not in ("Fornecedor", "Linha") and not padroes.get(c)]
     if faltando:
         pend.append(["Coluna obrigatória do Microvix sem valor em tabelas/padroes_microvix.csv", "", "",
                      ", ".join(faltando)])
@@ -101,6 +101,9 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
             desc_base = mg.nome_base_microvix(ex, aux) or desc_base
             ref_out = ex.ref[ex.aux == aux].iloc[0]
         codigos.append([it["marca"], ref_out, desc_base, aux, origem])
+        if not mg.linha_da_peca(desc_base):
+            pend.append(["Linha do Microvix desconhecida (incluir a 1ª palavra em tabelas/tipos_peca.csv)",
+                         it["marca"], it["ref"], desc_base])
         if not tm["fornecedor"] and not any(p[0].startswith("Marca sem fornecedor") and p[1] == it["marca"] for p in pend):
             pend.append(["Marca sem fornecedor em tabelas/marcas.csv (coluna obrigatória no Microvix)",
                          it["marca"], "", ""])
@@ -135,6 +138,9 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
                     put(nome, v)
             if tm["fornecedor"]:
                 put("Fornecedor", tm["fornecedor"])
+            linha = mg.linha_da_peca(desc_base)
+            if linha:
+                put("Linha", linha)
             por_marca.setdefault(it["marca"], []).append(row)
 
     os.makedirs(saida, exist_ok=True)
