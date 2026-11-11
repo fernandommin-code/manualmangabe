@@ -145,7 +145,7 @@ function marcaHTML(m,items,keepOpen){
 }
 function itemHTML(i){
   const id=confId(i),s=status(i),open=S.open===id;
-  return `<div class="item"><button class="ihead" data-act="toggle" data-id="${esc(id)}" aria-expanded="${open}"><span class="ref">${esc(i.ref)}</span><span class="counts"><span class="pill p-${s.k}">${esc(s.t)}</span><span>${s.n}/${i.esp} pç</span></span><span class="desc">${esc(i.desc||"")}${i.extra?" · fora do romaneio":""}</span></button>${open?editorHTML(i):""}</div>`;
+  return `<div class="item"><button class="ihead" data-act="toggle" data-id="${esc(id)}" aria-expanded="${open}"><span class="ref">${esc(i.ref)}</span><span class="counts"><span class="pill p-${s.k}">${esc(s.t)}</span><span>${s.n}/${i.esp} pç</span></span><span class="desc">${esc(i.desc||"")}${i.extra?" · fora do romaneio":""}${i.exist&&i.exist.length?`<br><small>já no sistema: ${esc(i.exist.join(", "))}</small>`:""}</span></button>${open?editorHTML(i):""}</div>`;
 }
 function editorHTML(i){
   const d=S.draft,grade=GRADES[d.tamKey]||GRADES.L,sizes=[...new Set(grade.concat(d.extraSizes||[]))];

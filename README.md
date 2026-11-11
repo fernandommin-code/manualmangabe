@@ -59,7 +59,11 @@ A Vicky tem uma linha por referência, só com a quantidade.
 Depois de conferir, mandam a foto das folhas. O Claude transcreve para o mesmo formato do app
 (`compras/<id>/conf`) e segue para as divergências e o cadastro.
 
-### App (opcional)
+### App (padrão a partir de 11/11)
+
+`scripts/carregar_app.py` prepara a compra para o app (com as cores já cadastradas nas reposições)
+e pode carregar conferências feitas em papel. O Claude grava com ArtifactData e lê de volta direto
+para os scripts de cadastro e entrada. A skill da rotina está em `skill/SKILL.md`.
 
 
 App: <https://claude.ai/artifact/Bw297fhPHqWy35JJEU1hds> (cópia em `app/conferencia.html`).
