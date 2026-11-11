@@ -98,7 +98,8 @@ def test_rotina_completa(tmp_path):
     ws = openpyxl.load_workbook(out / "Importacao_FPM.xlsx").active
     hdr = [(x.value or "").strip() for x in ws[1]]
     rows = [dict(zip(hdr, [x.value for x in row])) for row in ws.iter_rows(min_row=2)]
-    descs = [x["Descrição"] for x in rows]
+    assert rows[0]["Descrição"] == "VESTIDO MIDI LINHO"  # o Microvix acrescenta cor e tamanho
+    descs = [mg.descricao_produto(x["Descrição"], x["Cores"], x["Tamanho"]) for x in rows]  # nome final no Microvix
     assert descs == ["VESTIDO MIDI LINHO BEGE P", "VESTIDO MIDI LINHO PRETO P", "VESTIDO MIDI LINHO PRETO M",
                      "BLUSA BRUNA LASTEX LILAS XPP", "REGATA CANELADA BRANCO PP", "PONCHO TRICO CRU ÚNICO"]
     v = rows[0]

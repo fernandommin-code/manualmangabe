@@ -117,7 +117,7 @@ A primeira blusa é `639500`.
 
 | Coluna do modelo | Valor |
 |---|---|
-| Descrição | `<DESCRIÇÃO> <COR> <TAMANHO>`, ex.: `VESTIDO MIDI LINHO PRETO P`. Tamanho único: `BLUSA LINKS PRETO ÚNICO`. Acessório sem cor: só a descrição |
+| Descrição | só o modelo, ex.: `VESTIDO MIDI LINHO`. **O Microvix acrescenta a cor e o tamanho sozinho** e o produto fica `VESTIDO MIDI LINHO PRETO P` (teste da GULE) |
 | Referência | referência do fornecedor |
 | Cód. Auxiliar | regra acima |
 | Marca, Coleção, Tamanho, Cores | da planilha e da conferência |

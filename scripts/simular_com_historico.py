@@ -138,7 +138,7 @@ def main(cadastrados, modelo, saida, n, colecao="VERÃO 27"):
         h = [(c.value or "").strip() for c in w2[1]]
         for row in w2.iter_rows(min_row=2, values_only=True):
             d = dict(zip(h, row))
-            gerados[(mg.norm(d["Marca"]), mg.ref_key(d["Referência"]))].add(mg.norm(d["Descrição"]))
+            gerados[(mg.norm(d["Marca"]), mg.ref_key(d["Referência"]))].add(mg.norm(mg.descricao_produto(d["Descrição"], d["Cores"] or "", d["Tamanho"])))
     aux_ger = {(mg.norm(m), mg.ref_key(ref)): a for m, ref, _, a, _ in res["codigos"]}
 
     # 4. compara

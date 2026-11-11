@@ -120,7 +120,7 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
             def put(nome, v):
                 row[col[nome]] = v
 
-            put("Descrição", desc)
+            put("Descrição", " ".join(str(desc_base).upper().split()))  # o Microvix acrescenta cor e tamanho
             put("Referência", ref_out)
             put("Cód. Auxiliar", aux)
             put("Marca", it["marca"])
