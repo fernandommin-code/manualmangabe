@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Planilha de etiquetas a partir das listas de entrada (Entrada_LojaN.csv / *_lista.csv).
 
-Uma aba de resumo (produto × quantidade) e uma aba com uma linha por etiqueta, por loja.
+Uma aba de resumo (produto × quantidade; quantidade 1 fica em branco, como o sistema de etiquetas espera)
+e uma aba com uma linha por etiqueta, por loja.
 Código = código do produto no Microvix (é o código de barras). Preço = preço de venda do Microvix.
 
 Uso: python3 scripts/gerar_etiquetas.py Produtos_Cadastrados.xlsx saida.xlsx "Praiamar=lista_loja1.csv" "Miramar=lista_loja3.csv"
@@ -39,7 +40,7 @@ def gerar(cadastrados, saida, listas, precos=None):
             _, cor, t = mg.separar(d, cores, tams)
             preco = precos.get(c, mg.num(p.venda))
             q = int(r["Quantidade"])
-            res.append([int(c), d, p.ref, cor, t, preco, q])
+            res.append([int(c), d, p.ref, cor, t, preco, q if q > 1 else None])  # 1 etiqueta = em branco
             for _ in range(q):
                 et.append([int(c), d, p.ref, cor, t, preco])
             tot += q
