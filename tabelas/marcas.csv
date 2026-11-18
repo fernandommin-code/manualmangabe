@@ -5,7 +5,7 @@ id;marca;desconto_compra;fornecedor_microvix
 10;FDL;;
 11;FOUR ONE;;
 12;MODAS E CRIACAO;;
-14;OTHER GIRLS;10;
+14;OTHER GIRLS;10;20
 15;MIRO;;
 17;REKIM;10;
 19;LADY ROCK;;
@@ -13,12 +13,12 @@ id;marca;desconto_compra;fornecedor_microvix
 25;BETELGUESE;;
 27;EGOISTE;;
 31;TRAMA;;
-32;ALCANCE;;
+32;ALCANCE;;26
 34;DEBORA;;
 35;BLEND;;
 36;HIT;10;
 37;ESQUIRE;;
-38;BE FREE;15;
+38;BE FREE;15;7520
 39;FPM;15;19
 40;KAELE;7;
 44;GULE;15;22
@@ -38,5 +38,5 @@ id;marca;desconto_compra;fornecedor_microvix
 80;ELLA NOVA;;
 82;SALGUNAMU;20;
 85;MYSK;7;
-86;MUNA;;
+86;MUNA;;10900
 95;HUSH;10;
