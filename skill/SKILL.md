@@ -77,7 +77,7 @@ Depois da importação, pedir o Produtos Cadastrados de novo (só da marca, sem 
 
 ## Outros
 
-- `scripts/gerar_etiquetas.py RELATORIO saida.xlsx "Praiamar=lista1.csv" ...` — planilha de etiquetas por loja a partir das listas de entrada (código = código de barras, preço do Microvix).
+- `scripts/gerar_etiquetas.py RELATORIO saida.xlsx "Praiamar=lista1.csv" ...` — etiquetas a partir das listas de entrada. Gera por loja `<saida>_<LOJA>_importar.xlsx` no layout do Microvix (Etiquetas > Importar produtos, buscar por **Código do produto**): cabeçalho `Identificador Produto | Quantidade`, quantidade 1 = em branco. Também uma planilha de conferência com descrição, cor, tamanho e preço.
 - `scripts/proximos_codigos.py RELATORIO` — próximo código livre por marca.
 - `scripts/simular_com_historico.py RELATORIO MODELO saida/` — refaz as últimas referências de cada marca e compara com o Microvix; também lista repetidos e nomes fora do padrão.
 - **Cor sempre primária** (decisão do Fernando): AZUL CLARO/MARINHO → AZUL, ROSA BEBÊ/PINK → ROSA, VERDE MILITAR → VERDE etc. (`tabelas/cores_alias.csv`, aplicado pelos scripts; ao transcrever folha, já escrever a primária). Cor nova de verdade: acrescentar em `tabelas/cores.csv` e na lista do app. Marca nova: linha em `tabelas/marcas.csv` com ID, desconto e fornecedor.

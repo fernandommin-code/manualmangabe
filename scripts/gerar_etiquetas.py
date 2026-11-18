@@ -5,6 +5,9 @@ Uma aba de resumo (produto × quantidade; quantidade 1 fica em branco, como o si
 e uma aba com uma linha por etiqueta, por loja.
 Código = código do produto no Microvix (é o código de barras). Preço = preço de venda do Microvix.
 
+Também gera, por loja, <saida>_<LOJA>_importar.xlsx no layout do Microvix
+(Identificador Produto | Quantidade, buscar por Código do produto).
+
 Uso: python3 scripts/gerar_etiquetas.py Produtos_Cadastrados.xlsx saida.xlsx "Praiamar=lista_loja1.csv" "Miramar=lista_loja3.csv"
 """
 import csv
@@ -56,7 +59,19 @@ def gerar(cadastrados, saida, listas, precos=None):
                     row[5].number_format = '"R$" #,##0.00'
         totais[nome] = tot
     wb.save(saida)
-    print("etiquetas:", totais, "->", saida)
+    # arquivo de importação do Microvix (Etiquetas > Importar produtos, "Buscar produtos por: Código do produto"):
+    # cabeçalho Identificador Produto | Quantidade; quantidade 1 = em branco
+    base = os.path.splitext(saida)[0]
+    for nome, path in listas:
+        w2 = openpyxl.Workbook()
+        s2 = w2.active
+        s2.title = "Etiquetas"
+        s2.append(["Identificador Produto", "Quantidade"])
+        for r in csv.DictReader(open(path, encoding="utf-8-sig"), delimiter=";"):
+            q = int(r["Quantidade"])
+            s2.append([int(r["Cod.Produto"]), q if q > 1 else None])
+        w2.save(f"{base}_{mg.slug(nome)}_importar.xlsx")
+    print("etiquetas:", totais, "->", saida, "+ um *_importar.xlsx por loja")
     return totais
 
 
