@@ -23,6 +23,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import mangabe as mg  # noqa: E402
 
 
+# acessórios que abrem no app com tamanho único (cinto fica com a grade P–G; a vendedora pode trocar)
+UNICOS = {"CLUTCH", "BOLSA", "BRINCO", "COLAR", "CHOKER", "KIT", "BRACELETE", "PULSEIRA", "ANEL", "COLEIRA", "MAXI"}
+
+
 def gerar(planilha, saida, data, cadastrados=None, conf_dir=None):
     itens = mg.ler_planilha(planilha)
     ex = mg.ler_cadastrados(cadastrados) if cadastrados else None
@@ -36,9 +40,10 @@ def gerar(planilha, saida, data, cadastrados=None, conf_dir=None):
     for it in itens.values():
         marcas.setdefault(it["marca"], []).append(it)
     for ordem, (marca, its) in enumerate(marcas.items(), start=1):
-        unico = mg.norm(marca) == "VICKY"
         lista = []
         for it in its:
+            primeira = (mg.norm(it["desc"]).split() or [""])[0]
+            unico = mg.norm(marca) == "VICKY" or primeira in UNICOS
             item = {"ref": it["ref"], "desc": it["desc"], "lj": it["lj"], "tam": "U" if unico else "L"}
             tm, dig = tab_m.get(mg.norm(marca)), tab_c.get(mg.norm(it["col"]))
             if ex is not None and tm and dig:
@@ -61,7 +66,8 @@ def gerar(planilha, saida, data, cadastrados=None, conf_dir=None):
                       for l in c.get("linhas", []) if any(int(v) for v in l["q"].values())]
             total = sum(q for l in linhas for q in l["q"].values())
             doc = {"loja": loja, "marca": it["marca"], "ref": it["ref"], "desc": it["desc"],
-                   "esperado": it["lj"][loja], "extra": False, "tamKey": "U" if mg.norm(it["marca"]) == "VICKY" else "L",
+                   "esperado": it["lj"][loja], "extra": False,
+                   "tamKey": "U" if mg.norm(it["marca"]) == "VICKY" or (mg.norm(it["desc"]).split() or [""])[0] in UNICOS else "L",
                    "extraSizes": [], "linhas": linhas, "total": total,
                    "obs": c.get("obs") or ("transcrito da folha de papel" if total == it["lj"][loja]
                                            else "transcrito da folha de papel - conferir"),
