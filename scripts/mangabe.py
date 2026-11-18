@@ -57,7 +57,8 @@ def marcas():
     for r in _csv("marcas.csv"):
         d = r["desconto_compra"].strip()
         out[norm(r["marca"])] = {"id": r["id"].zfill(2), "desconto": float(d) if d else 0.0,
-                                 "fornecedor": (r.get("fornecedor_microvix") or "").strip()}
+                                 "fornecedor": (r.get("fornecedor_microvix") or "").strip(),
+                                 "marca_microvix": (r.get("marca_microvix") or "").strip()}
     return out
 
 

@@ -133,7 +133,7 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
             put("Descrição", " ".join(str(desc_base).upper().split()))  # o Microvix acrescenta cor e tamanho
             put("Referência", ref_out)
             put("Cód. Auxiliar", aux)
-            put("Marca", it["marca"])
+            put("Marca", tm.get("marca_microvix") or it["marca"])  # nome exato da marca no Microvix
             put("Coleção", it["col"])
             put("Tamanho", tam)
             put("Cores", cor or None)
