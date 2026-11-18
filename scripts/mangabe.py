@@ -220,7 +220,10 @@ def produtos_existentes(ex, ref, cor, tam, aux=None):
     if not cor and tam == "ÚNICO":
         return list(m.cod) if len(m) == 1 else []
     fim = norm(f"{cor} {tam}" if cor else tam)
-    return [c for d, c in zip(m.desc_n, m.cod) if d == fim or d.endswith(" " + fim)]
+    cods = [c for d, c in zip(m.desc_n, m.cod) if d == fim or d.endswith(" " + fim)]
+    if not cods and tam == "ÚNICO" and len(m) == 1:  # marca sem grade (Vicky): produto único, sem cor no nome
+        return list(m.cod)
+    return cods
 
 
 REPETIDOS = []  # (ref, cor, tam, [códigos]) encontrados na última consulta
