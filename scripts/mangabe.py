@@ -58,7 +58,10 @@ def marcas():
         d = r["desconto_compra"].strip()
         out[norm(r["marca"])] = {"id": r["id"].zfill(2), "desconto": float(d) if d else 0.0,
                                  "fornecedor": (r.get("fornecedor_microvix") or "").strip(),
-                                 "marca_microvix": (r.get("marca_microvix") or "").strip()}
+                                 "marca_microvix": (r.get("marca_microvix") or "").strip(),
+                                 # linha fixa da marca no Microvix (ex.: VICKY -> ACESSÓRIO) e marca sem cor/tamanho
+                                 "linha_microvix": (r.get("linha_microvix") or "").strip(),
+                                 "sem_grade": (r.get("sem_grade") or "").strip().upper() in ("S", "SIM", "1")}
     return out
 
 

@@ -101,7 +101,7 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
             desc_base = mg.nome_base_microvix(ex, aux) or desc_base
             ref_out = ex.ref[ex.aux == aux].iloc[0]
         codigos.append([it["marca"], ref_out, desc_base, aux, origem])
-        if not mg.linha_da_peca(desc_base):
+        if not (tm.get("linha_microvix") or mg.linha_da_peca(desc_base)):
             pend.append(["Linha do Microvix desconhecida (incluir a 1ª palavra em tabelas/tipos_peca.csv)",
                          it["marca"], it["ref"], desc_base])
         if not tm["fornecedor"] and not any(p[0].startswith("Marca sem fornecedor") and p[1] == it["marca"] for p in pend):
@@ -135,8 +135,9 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
             put("Cód. Auxiliar", aux)
             put("Marca", tm.get("marca_microvix") or it["marca"])  # nome exato da marca no Microvix
             put("Coleção", it["col"])
-            put("Tamanho", tam)
-            put("Cores", cor or None)
+            if not tm.get("sem_grade"):  # marcas sem grade (Vicky): sem cor e sem tamanho, como no Microvix
+                put("Tamanho", tam)
+                put("Cores", cor or None)
             put("Contabiliza saldo em estoque", "Sim")
             # custo LÍQUIDO e Desconto 0: numa entrada com repiques (já líquidos) e produtos novos,
             # o desconto no fim da nota pegaria todos; com tudo líquido, a entrada não leva desconto.
@@ -150,7 +151,7 @@ def gerar(planilha, conf_dir, modelo, cadastrados, saida, fech_dir=None):
                     put(nome, v)
             if tm["fornecedor"]:
                 put("Fornecedor", tm["fornecedor"])
-            linha = mg.linha_da_peca(desc_base)
+            linha = tm.get("linha_microvix") or mg.linha_da_peca(desc_base)
             if linha:
                 put("Linha", linha)
             por_marca.setdefault(it["marca"], []).append(row)
