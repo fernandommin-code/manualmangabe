@@ -13,7 +13,7 @@ id;marca;desconto_compra;fornecedor_microvix
 25;BETELGUESE;;
 27;EGOISTE;;
 31;TRAMA;;
-32;ALCANCE;;26
+32;ALCANCE;15;26
 34;DEBORA;;
 35;BLEND;;
 36;HIT;10;
@@ -38,5 +38,5 @@ id;marca;desconto_compra;fornecedor_microvix
 80;ELLA NOVA;;
 82;SALGUNAMU;20;
 85;MYSK;7;
-86;MUNA;;10900
+86;MUNA;5;10900
 95;HUSH;10;
