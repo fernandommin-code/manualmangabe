@@ -4,7 +4,7 @@ id;marca;desconto_compra;fornecedor_microvix;marca_microvix
 06;ESMERAL;13;;
 10;FDL;;;
 11;FOUR ONE;;;
-12;MODAS E CRIACAO;;;
+12;MODAS E CRIACAO;10;7524;
 14;OTHER GIRLS;10;20;
 15;MIRO;;;
 17;REKIM;10;7731;
@@ -31,10 +31,10 @@ id;marca;desconto_compra;fornecedor_microvix;marca_microvix
 72;DONNA RITZ;15;;
 73;CHAMPAGNE;;;
 74;VERA;;;
-75;VICKY;10;;
+75;VICKY;10;23;
 76;AQUA;;;
 77;BARRUK;;;
-79;TOVA;15;;
+79;TOVA;15;10;
 80;ELLA NOVA;;;
 82;SALGUNAMU;20;;
 85;MYSK;7;;
