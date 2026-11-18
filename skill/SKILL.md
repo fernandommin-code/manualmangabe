@@ -79,5 +79,5 @@ Depois da importação, pedir o Produtos Cadastrados de novo (só da marca, sem 
 
 - `scripts/proximos_codigos.py RELATORIO` — próximo código livre por marca.
 - `scripts/simular_com_historico.py RELATORIO MODELO saida/` — refaz as últimas referências de cada marca e compara com o Microvix; também lista repetidos e nomes fora do padrão.
-- Cor nova no cadastro: acrescentar em `tabelas/cores.csv` (e na lista do app). Marca nova: linha em `tabelas/marcas.csv` com ID, desconto e fornecedor.
+- **Cor sempre primária** (decisão do Fernando): AZUL CLARO/MARINHO → AZUL, ROSA BEBÊ/PINK → ROSA, VERDE MILITAR → VERDE etc. (`tabelas/cores_alias.csv`, aplicado pelos scripts; ao transcrever folha, já escrever a primária). Cor nova de verdade: acrescentar em `tabelas/cores.csv` e na lista do app. Marca nova: linha em `tabelas/marcas.csv` com ID, desconto e fornecedor.
 - Ao terminar uma mudança nas regras, atualizar também o repositório `manualmangabe` (README e scripts) para os dois não divergirem.

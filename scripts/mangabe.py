@@ -108,9 +108,19 @@ def norm_tam(t):
     return TAM_ALIAS.get(t, TAM_ALIAS.get(norm(t), t))
 
 
+def _alias_cores():
+    try:
+        return {norm(r["escrito"]): norm(r["cor"]) for r in _csv("cores_alias.csv")}
+    except FileNotFoundError:
+        return {}
+
+
 def norm_cor(c):
+    """Cor como vai para o Microvix: sempre a cor primária (AZUL CLARO -> AZUL; tabelas/cores_alias.csv)."""
     c = norm(c)
-    return "" if c in ("", "SEM COR", "UNICA", "UNICO") else c
+    if c in ("", "SEM COR", "UNICA", "UNICO"):
+        return ""
+    return _alias_cores().get(c, c)
 
 
 def cores_tab():
