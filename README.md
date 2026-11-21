@@ -165,7 +165,7 @@ Se der erro, clicar em "Visualizar inconsistências" e mandar um print com o mot
    - `Entrada_LojaN.csv`: `Cod.Produto;Descrição;Quantidade`
    - `Entrada_LojaN.txt`: um Cod.Produto por peça, para leitura em lote
    - `Entrada_nao_encontrados.csv`: o que não achou produto (normalmente cor escrita diferente)
-3. Dar a entrada em cada loja importando o `Entrada_LojaN.txt`: **um código por linha, uma linha por peça** (testado na GULE em 11/11). O formato `código;quantidade` não é aceito.
+3. Dar a entrada em cada loja importando o `Entrada_LojaN.txt`: **`código;quantidade;custo`** (decimal com ponto). Nota fiscal de entrada → Inserir itens → Inserir itens via arquivo em lote → **"Arquivo de texto (com delimitador)"** → **Ponto e Vírgula** (testado na Alcance em 21/11). No tipo "posição fixa" o Microvix ignora o custo e usa o preço de venda da tabela padrão.
 
 ---
 

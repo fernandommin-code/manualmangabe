@@ -73,7 +73,7 @@ O que aprendemos testando (GULE e FPM, 11/11/2026):
 
 ## 8. Entrada de estoque
 
-Depois da importação, pedir o Produtos Cadastrados de novo (só da marca, sem filtro de data). `scripts/gerar_entrada.py --conf DIR --cadastrados R --planilha P --saida S` → por loja `Entrada_LojaN.txt` (**um código por linha, uma linha por peça** — único formato que a tela aceitou; "código;quantidade" é recusado) e `Entrada_LojaN.csv` (lista para conferir). Inclui repiques e produtos novos numa entrada só por loja; `Entrada_nao_encontrados.csv` lista o que não achou código. Lembrar a moça: **não aplicar desconto no fim da entrada** (os custos já estão líquidos) e conferir o total de peças antes de encerrar — entrada encerrada não se altera.
+Depois da importação, pedir o Produtos Cadastrados de novo (só da marca, sem filtro de data). `scripts/gerar_entrada.py --conf DIR --cadastrados R --planilha P --saida S` → por loja `Entrada_LojaN.txt` (**`código;quantidade;custo`**, decimal com ponto, ex. `33246;1;254.15`). Na Nota fiscal de entrada: Inserir itens → **Inserir itens via arquivo em lote** → tipo **"Arquivo de texto (com delimitador)"** → **Ponto e Vírgula** (testado na Alcance em 21/11). Com "posição fixa" o Microvix lê só código e quantidade e põe o **preço de venda** (Preço Tabela padrão) na nota — nunca salvar assim. Também `Custos_entrada` por loja com o valor total da nota para conferir e `Entrada_LojaN.csv` (lista para conferir). Inclui repiques e produtos novos numa entrada só por loja; `Entrada_nao_encontrados.csv` lista o que não achou código. Lembrar a moça: **não aplicar desconto no fim da entrada** (os custos já estão líquidos) e conferir o total de peças antes de encerrar — entrada encerrada não se altera.
 
 ## Outros
 

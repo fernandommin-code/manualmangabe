@@ -10,8 +10,11 @@ Uso:
 
 Saídas em --saida:
   Entrada_Loja1.csv / Loja2 / Loja3   Cod.Produto;Descrição;Quantidade
-  Entrada_Loja1.txt / ...             ARQUIVO PARA O MICROVIX: um código por linha, uma linha por peça
-                                      (testado na GULE em 11/11; "cod;qtd" não é aceito)
+  Entrada_Loja1.txt / ...             ARQUIVO PARA O MICROVIX: codigo;quantidade;custo (decimal com ponto)
+                                      Nota fiscal de entrada > Inserir itens via arquivo em lote >
+                                      "Arquivo de texto (com delimitador)" > Ponto e Vírgula (testado na Alcance
+                                      em 21/11). Com "posição fixa" o Microvix só lê código/quantidade e põe o
+                                      preço de VENDA da tabela padrão na nota.
   Entrada_nao_encontrados.csv         grade conferida que não achou produto no Microvix
 """
 import argparse
@@ -23,12 +26,20 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import mangabe as mg  # noqa: E402
 
 
+def custo_entrada(ex, cod, it, tm):
+    """Custo da nota: o líquido da planilha (custo × (1 − desconto)) quando houver; senão o do Microvix."""
+    if it and it.get("custo") and tm:
+        return mg.custo_liquido(it["custo"], tm["desconto"])
+    return mg.num(ex.loc[ex.cod == cod, "custo"].iloc[0])
+
+
 def gerar(conf_dir, cadastrados, saida, planilha=None):
     ex = mg.ler_cadastrados(cadastrados)
     grade = mg.grade_conferida(mg.ler_conferencia(conf_dir))
     itens = mg.ler_planilha(planilha) if planilha else {}
     tab_marcas, tab_col = mg.marcas(), mg.colecoes()
     lojas = {0: {}, 1: {}, 2: {}}
+    custos = {}
     nao = []
     for (m, ref), g in sorted(grade.items()):
         aux = None
@@ -49,6 +60,7 @@ def gerar(conf_dir, cadastrados, saida, planilha=None):
             desc = ex.loc[ex.cod == cod, "desc"].iloc[0]
             for loja, n in q.items():
                 lojas[loja][cod] = (desc, lojas[loja].get(cod, ("", 0))[1] + n)
+            custos[cod] = custo_entrada(ex, cod, it, tm)
 
     os.makedirs(saida, exist_ok=True)
     resumo = {}
@@ -63,7 +75,7 @@ def gerar(conf_dir, cadastrados, saida, planilha=None):
                 w.writerow([cod, desc, n])
         with open(base + ".txt", "w", encoding="utf-8") as f:
             for cod, (_, n) in sorted(prods.items()):
-                f.write((cod + "\n") * n)
+                f.write(f"{cod};{n};{custos[cod]:.2f}\n")
         resumo[loja + 1] = sum(n for _, n in prods.values())
     if nao:
         with open(os.path.join(saida, "Entrada_nao_encontrados.csv"), "w", newline="", encoding="utf-8-sig") as f:

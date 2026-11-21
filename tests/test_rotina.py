@@ -126,7 +126,8 @@ def test_rotina_completa(tmp_path):
     with open(out / "Entrada_Loja1.csv", encoding="utf-8-sig") as f:
         l1 = {r["Cod.Produto"]: int(r["Quantidade"]) for r in csv.DictReader(f, delimiter=";")}
     assert l1["20004"] == 1 and "20005" not in l1
-    assert open(out / "Entrada_Loja2.txt").read().split() == ["30002", "30003"]
+    # formato que o Microvix lê com custo: codigo;quantidade;custo (delimitador ponto e vírgula)
+    assert open(out / "Entrada_Loja2.txt").read().split() == ["30002;1;135.91", "30003;1;75.65"]
 
 
 def test_parte_da_peca():
